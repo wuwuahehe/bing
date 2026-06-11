@@ -179,6 +179,10 @@
 			<Option compile="1" />
 			<Option compiler="riscv32" use="1" buildCommand=" " />
 		</Unit>
+		<Unit filename="app/app_temp_control.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="app/app_temp_control.h" />
 		<Unit filename="app/func.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -265,6 +269,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="bsp/bsp_charge.h" />
+		<Unit filename="bsp/bsp_display188.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bsp/bsp_display188.h" />
+		<Unit filename="bsp/bsp_fan.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bsp/bsp_fan.h" />
 		<Unit filename="bsp/bsp_huart.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -281,6 +293,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="bsp/bsp_key.h" />
+		<Unit filename="bsp/bsp_ntc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bsp/bsp_ntc.h" />
 		<Unit filename="bsp/bsp_param.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -305,6 +321,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="bsp/bsp_sys.h" />
+		<Unit filename="bsp/bsp_tec.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bsp/bsp_tec.h" />
 		<Unit filename="bsp/bsp_tone.c">
 			<Option compilerVar="CC" />
 		</Unit>

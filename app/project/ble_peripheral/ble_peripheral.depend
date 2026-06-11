@@ -1,0 +1,640 @@
+# depslib dependency file v1.0
+1757064023 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_adv_timer.c
+	"driver_adv_timer.h"
+
+1757064023 d:\d盘\hr042-r2资料\soft\app\driver\driver_adv_timer.h
+	"driver_com.h"
+
+1752586523 d:\d盘\hr042-r2资料\soft\app\driver\driver_com.h
+	"global.h"
+	"api.h"
+	"driver_clk.h"
+
+1681357605 d:\d盘\hr042-r2资料\soft\app\header\global.h
+	<stddef.h>
+	<stdarg.h>
+	<stdbool.h>
+	<stdlib.h>
+	<string.h>
+	"typedef.h"
+	"macro.h"
+	"clib.h"
+	"sfr.h"
+
+1681370977 d:\d盘\hr042-r2资料\soft\app\header\typedef.h
+
+1749815663 d:\d盘\hr042-r2资料\soft\app\header\macro.h
+
+1692174457 d:\d盘\hr042-r2资料\soft\app\header\clib.h
+
+1692174457 d:\d盘\hr042-r2资料\soft\app\header\sfr.h
+
+1759046628 d:\d盘\hr042-r2资料\soft\app\libs\api.h
+	"api_interrupt.h"
+	"api_btstack.h"
+	"api_cm.h"
+	"api_update.h"
+	"api_sysclk.h"
+	"api_msg.h"
+	"api_sys.h"
+	"api_pwr.h"
+	"api_key.h"
+	"api_sdadc.h"
+	"api_codec.h"
+	"api_usb.h"
+	"api_device.h"
+	"api_os.h"
+	"api_list.h"
+
+1726112666 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_interrupt.h
+
+1764227803 d:\d盘\hr042-r2资料\soft\app\libs\ble\api_btstack.h
+
+1776146285 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_cm.h
+
+1764582512 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_update.h
+
+1716364032 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_sysclk.h
+
+1681357605 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_msg.h
+
+1763040482 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_sys.h
+
+1718281019 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_pwr.h
+
+1701306842 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_key.h
+
+1725884089 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_sdadc.h
+
+1730194907 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_codec.h
+
+1764828115 d:\d盘\hr042-r2资料\soft\app\libs\usb\api_usb.h
+	"usb_define.h"
+
+1758770517 d:\d盘\hr042-r2资料\soft\app\libs\usb\usb_define.h
+
+1733303608 d:\d盘\hr042-r2资料\soft\app\libs\usb\api_device.h
+
+1761621995 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_os.h
+
+1759046628 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_list.h
+
+1752632357 d:\d盘\hr042-r2资料\soft\app\driver\driver_clk.h
+	"global.h"
+	"api.h"
+
+1751470914 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_charge.c
+	"driver_charge.h"
+
+1745993153 d:\d盘\hr042-r2资料\soft\app\driver\driver_charge.h
+	"driver_com.h"
+
+1752586523 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_clk.c
+	"driver_clk.h"
+
+1753698985 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_gpio.c
+	"driver_gpio.h"
+
+1750247971 d:\d盘\hr042-r2资料\soft\app\driver\driver_gpio.h
+	"driver_com.h"
+
+1695301485 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_hsuart.c
+	"driver_hsuart.h"
+
+1692272097 d:\d盘\hr042-r2资料\soft\app\driver\driver_hsuart.h
+	"driver_com.h"
+
+1757064023 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_iic.c
+	"driver_iic.h"
+
+1761829993 d:\d盘\hr042-r2资料\soft\app\driver\driver_iic.h
+	"driver_com.h"
+
+1706603398 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_irrx.c
+	"driver_ir.h"
+
+1708997754 d:\d盘\hr042-r2资料\soft\app\driver\driver_ir.h
+	"driver_com.h"
+
+1708997754 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_irtx.c
+	"driver_ir.h"
+	"driver_gpio.h"
+	"macro.h"
+
+1708677057 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_keyscan.c
+	"driver_keyscan.h"
+
+1706594461 d:\d盘\hr042-r2资料\soft\app\driver\driver_keyscan.h
+	"driver_com.h"
+
+1750079636 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_ledc.c
+	"driver_ledc.h"
+
+1691641855 d:\d盘\hr042-r2资料\soft\app\driver\driver_ledc.h
+	"driver_com.h"
+
+1761546706 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_lowpwr.c
+	"driver_gpio.h"
+	"driver_saradc.h"
+	"driver_lowpwr.h"
+
+1695092048 d:\d盘\hr042-r2资料\soft\app\driver\driver_saradc.h
+	"driver_com.h"
+
+1731641111 d:\d盘\hr042-r2资料\soft\app\driver\driver_lowpwr.h
+	"driver_com.h"
+
+1691641855 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_lpwm.c
+	"driver_lpwm.h"
+
+1692272097 d:\d盘\hr042-r2资料\soft\app\driver\driver_lpwm.h
+	"driver_com.h"
+
+1764919609 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_qdec.c
+	"driver_qdec.h"
+
+1752586523 d:\d盘\hr042-r2资料\soft\app\driver\driver_qdec.h
+	"driver_com.h"
+
+1730712251 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_rtc.c
+	"driver_rtc.h"
+
+1730460110 d:\d盘\hr042-r2资料\soft\app\driver\driver_rtc.h
+	"driver_com.h"
+
+1741682541 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_saradc.c
+	"driver_saradc.h"
+
+1724061152 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_sdadc.c
+	"driver_sdadc.h"
+	"driver_clk.h"
+
+1695021625 d:\d盘\hr042-r2资料\soft\app\driver\driver_sdadc.h
+	"driver_com.h"
+
+1752290232 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_sddac.c
+	"driver_sddac.h"
+	"driver_clk.h"
+
+1748261450 d:\d盘\hr042-r2资料\soft\app\driver\driver_sddac.h
+	"driver_com.h"
+
+1761621995 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_spi.c
+	"driver_spi.h"
+
+1747884851 d:\d盘\hr042-r2资料\soft\app\driver\driver_spi.h
+	"driver_com.h"
+
+1734082013 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_tmr.c
+	"driver_tmr.h"
+
+1692272097 d:\d盘\hr042-r2资料\soft\app\driver\driver_tmr.h
+	"driver_com.h"
+
+1744941034 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_touch_key.c
+	"driver_touch_key.h"
+	"driver_gpio.h"
+
+1744941034 d:\d盘\hr042-r2资料\soft\app\driver\driver_touch_key.h
+	"driver_com.h"
+
+1694162602 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_uart.c
+	"driver_uart.h"
+
+1694162602 d:\d盘\hr042-r2资料\soft\app\driver\driver_uart.h
+	"driver_com.h"
+
+1694504641 source:d:\d盘\hr042-r2资料\soft\app\driver\driver_wdt.c
+	"driver_wdt.h"
+
+1692272097 d:\d盘\hr042-r2资料\soft\app\driver\driver_wdt.h
+	"driver_com.h"
+
+1764901929 source:d:\d盘\hr042-r2资料\soft\app\modules\utils\utils_ring_buffer.c
+	"include.h"
+	"utils_ring_buffer.h"
+
+1692272097 d:\d盘\hr042-r2资料\soft\app\header\include.h
+	"global.h"
+	"xcfg.h"
+	"config.h"
+	"api.h"
+	"bsp.h"
+
+1713940829 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\xcfg.h
+
+1780998244 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\config.h
+	"config_define.h"
+	"config_extra.h"
+
+1764582512 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\config_define.h
+
+1753769239 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\config_extra.h
+
+1781077034 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp.h
+	"bsp_param.h"
+	"bsp_sys.h"
+	"ble_service.h"
+	"ble_init.h"
+	"ble_proc.h"
+	"bsp_uart_debug.h"
+	"bsp_saradc.h"
+	"bsp_saradc_vbat.h"
+	"bsp_key.h"
+	"bsp_touch_key.h"
+	"bsp_charge.h"
+	"bsp_huart_iodm.h"
+	"bsp_saradc_tsensor.h"
+	"bsp_ntc.h"
+	"bsp_display188.h"
+	"bsp_fan.h"
+	"bsp_tec.h"
+	"func.h"
+	"msg.h"
+	"prod_test.h"
+	"bsp_tone.h"
+
+1695278674 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_param.h
+
+1752545349 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_sys.h
+
+1700810850 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\ble\ble_service.h
+
+1729586989 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\ble\ble_init.h
+
+1696730956 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\ble\ble_proc.h
+
+1694007499 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_uart_debug.h
+
+1705287263 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_saradc.h
+
+1752722337 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_saradc_vbat.h
+
+1708410146 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_key.h
+
+1711607437 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_touch_key.h
+	"driver_com.h"
+
+1692272097 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_charge.h
+
+1692272097 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_huart_iodm.h
+
+1718281019 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_saradc_tsensor.h
+
+1781069952 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_ntc.h
+	"driver_saradc.h"
+
+1781055385 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_display188.h
+	"include.h"
+
+1781070483 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_fan.h
+
+1781076378 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_tec.h
+	"include.h"
+
+1712742838 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func.h
+	"func_bt.h"
+	"func_le_fcc.h"
+	"func_le_bqb_rf.h"
+	"func_iodm.h"
+	"func_idle.h"
+	"func_lowpwr.h"
+
+1681357605 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_bt.h
+
+1691412042 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_le_fcc.h
+
+1691412042 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_le_bqb_rf.h
+
+1691657427 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_iodm.h
+
+1681357605 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_idle.h
+
+1753252727 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_lowpwr.h
+
+1699005696 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\msg.h
+
+1712742838 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\production_test\prod_test.h
+	"prod_test_iodm.h"
+	"prod_test_tbox.h"
+
+1712742838 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\production_test\iodm\prod_test_iodm.h
+
+1712742838 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\production_test\tbox\prod_test_tbox.h
+	"include.h"
+
+1752226448 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_tone.h
+	"include.h"
+	"res.h"
+	"dec.h"
+
+1681357605 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\res.h
+
+1748261450 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\audio\dec\dec.h
+	"include.h"
+	"driver_sddac.h"
+
+1764901929 d:\d盘\hr042-r2资料\soft\app\modules\utils\utils_ring_buffer.h
+
+1781080949 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func.c
+	"include.h"
+	"dec.h"
+	"app_temp_control.h"
+
+1781080477 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\app_temp_control.h
+	"include.h"
+
+1753252727 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_bt.c
+	"include.h"
+	"func.h"
+
+1681357605 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_idle.c
+	"include.h"
+	"func.h"
+	"func_idle.h"
+
+1752545349 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_iodm.c
+	"include.h"
+	"func.h"
+
+1752545349 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_le_bqb_rf.c
+	"include.h"
+	"func.h"
+
+1752545349 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_le_fcc.c
+	"include.h"
+	"func.h"
+
+1761546706 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_lowpwr.c
+	"include.h"
+	"driver_lowpwr.h"
+	"driver_charge.h"
+	"driver_gpio.h"
+	"ble_user_service.h"
+	"bsp_io_key.h"
+
+1701675546 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\ble\ble_user_service.h
+
+1731576232 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_io_key.h
+	"driver_gpio.h"
+
+1751025230 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_tbox.c
+	"include.h"
+	"func.h"
+	"func_tbox.h"
+	"prod_test_tbox.h"
+
+1712742838 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\func_tbox.h
+
+1762933386 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\msg_bt.c
+	"include.h"
+
+1681357605 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\msg_idle.c
+	"include.h"
+	"func.h"
+	"func_idle.h"
+
+1691657427 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\msg_iodm.c
+	"include.h"
+
+1691412042 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\msg_le_bqb_rf.c
+	"include.h"
+
+1691412042 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\msg_le_fcc.c
+	"include.h"
+
+1712742838 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\msg_tbox.c
+	"include.h"
+	"tbox_key.h"
+
+1712742838 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\production_test\tbox\tbox_key.h
+	"include.h"
+
+1752226448 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\audio\dec\mp3_dec.c
+	"include.h"
+	"driver_sddac.h"
+	"res.h"
+	"api_codec.h"
+	"driver_gpio.h"
+
+1752226448 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\audio\dec\sin_dec.c
+	"include.h"
+	"driver_sddac.h"
+	"dec.h"
+	"api_codec.h"
+	"driver_gpio.h"
+	"api_sddac.h"
+
+1748261450 d:\d盘\hr042-r2资料\soft\app\libs\cpu\api_sddac.h
+	"driver_sddac.h"
+
+1752226448 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\audio\dec\wav_dec.c
+	"include.h"
+	"driver_sddac.h"
+	"res.h"
+	"api_codec.h"
+	"driver_gpio.h"
+	"api_sddac.h"
+
+1764582512 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\ble\ble_fota_service.c
+	"include.h"
+
+1750402645 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\ble\ble_init.c
+	"include.h"
+
+1733919880 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\ble\ble_proc.c
+	"include.h"
+	"ble_user_service.h"
+	"ble_fota_service.h"
+
+1681357605 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\ble\ble_fota_service.h
+
+1709704263 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\ble\ble_service.c
+	"include.h"
+	"ble_service.h"
+	"ble_user_service.h"
+	"ble_fota_service.h"
+
+1762766301 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\ble\ble_user_service.c
+	"include.h"
+	"ble_service.h"
+
+1730798019 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_charge.c
+	"include.h"
+	"driver_charge.h"
+	"bsp_charge.h"
+	"bsp_saradc_vbat.h"
+
+1781063378 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_display188.c
+	"bsp_display188.h"
+	"driver_gpio.h"
+
+1781070147 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_fan.c
+	"include.h"
+	"driver_gpio.h"
+	"bsp_fan.h"
+
+1731292149 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_huart.c
+	"include.h"
+	"bsp_huart.h"
+	"api.h"
+	"driver_com.h"
+	"driver_hsuart.h"
+	"ble_init.h"
+	"driver_gpio.h"
+	"config.h"
+
+1722255943 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_huart.h
+
+1703315374 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_huart_iodm.c
+	"include.h"
+	"bsp_huart_iodm.h"
+	"driver_hsuart.h"
+	"prod_test_iodm.h"
+	"driver_gpio.h"
+
+1760337637 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_io_key.c
+	"include.h"
+	"bsp_io_key.h"
+
+1709889161 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_key.c
+	"include.h"
+	"driver_com.h"
+	"bsp_saradc_key.h"
+	"bsp_io_key.h"
+
+1693540789 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_saradc_key.h
+
+1781069955 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_ntc.c
+	"include.h"
+	"driver_saradc.h"
+	"driver_gpio.h"
+	"bsp_ntc.h"
+
+1758781778 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_param.c
+	"include.h"
+
+1780997825 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_saradc.c
+	"include.h"
+	"driver_saradc.h"
+	"bsp_saradc.h"
+	"bsp_saradc_vbat.h"
+	"bsp_ntc.h"
+
+1708497989 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_saradc_key.c
+	"include.h"
+	"driver_saradc.h"
+	"bsp_saradc_key.h"
+	"bsp_key.h"
+
+1718281019 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_saradc_tsensor.c
+	"include.h"
+	"driver_saradc.h"
+	"bsp_saradc_tsensor.h"
+
+1752722337 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_saradc_vbat.c
+	"include.h"
+	"driver_saradc.h"
+	"driver_charge.h"
+	"bsp_saradc_vbat.h"
+
+1781080555 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_sys.c
+	"include.h"
+	"driver_lowpwr.h"
+	"bsp_saradc_key.h"
+	"bsp_ntc.h"
+	"bsp_tec.h"
+	"bsp_fan.h"
+	"app_temp_control.h"
+	"bsp_display188.h"
+
+1781078320 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_tec.c
+	"bsp_tec.h"
+	"driver_gpio.h"
+	"driver_saradc.h"
+
+1759211960 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_tone.c
+	"include.h"
+	"bsp_tone.h"
+	"driver_gpio.h"
+	"driver_sddac.h"
+	"api_sddac.h"
+
+1711607437 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_touch_key.c
+	"include.h"
+	"driver_touch_key.h"
+	"bsp_touch_key.h"
+
+1742302791 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\bsp\bsp_uart_debug.c
+	"include.h"
+	"driver_gpio.h"
+	"driver_uart.h"
+	"bsp_uart_debug.h"
+
+1741915750 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\main.c
+	"include.h"
+	"driver_lowpwr.h"
+
+1712742838 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\production_test\iodm\prod_test_iodm.c
+	"include.h"
+	"prod_test_iodm.h"
+	"bsp_huart_iodm.h"
+
+1712742838 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\production_test\prod_test.c
+	"include.h"
+	"prod_test.h"
+
+1715247669 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\production_test\tbox\prod_test_tbox.c
+	"include.h"
+	"tbox_key.h"
+	"tbox_voice.h"
+	"prod_test_tbox.h"
+
+1713231859 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\production_test\tbox\tbox_voice.h
+	"include.h"
+
+1712742838 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\production_test\tbox\tbox_key.c
+	"include.h"
+	"tbox_key.h"
+	"prod_test_tbox.h"
+
+1764901929 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\production_test\tbox\tbox_voice.c
+	"include.h"
+	"tbox_key.h"
+	"tbox_voice.h"
+	"api_sysclk.h"
+	"prod_test_tbox.h"
+	"tbox_voice_sdadc.h"
+	"utils_ring_buffer.h"
+
+1712742838 d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\production_test\tbox\tbox_voice_sdadc.h
+	"api_sdadc.h"
+
+1764901929 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\production_test\tbox\tbox_voice_sdadc.c
+	"include.h"
+	"tbox_voice_sdadc.h"
+	"driver_gpio.h"
+	"utils_ring_buffer.h"
+	"driver_sdadc.h"
+
+1764582512 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\strong_symbol.c
+	"include.h"
+	"driver_uart.h"
+
+1781085292 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\app\app_temp_control.c
+	"app_temp_control.h"
+	"bsp_ntc.h"
+	"bsp_display188.h"
+	"bsp_tec.h"
+	"bsp_fan.h"
+
+1741915750 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\output\bin\app.xm
+	"config.h"
+
+1681357605 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\output\bin\download.xm
+
+1741915750 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\output\bin\xcfg.xm
+
+1756102057 source:d:\d盘\hr042-r2资料\soft\app\project\ble_peripheral\ram.ld
+	"config.h"
+
