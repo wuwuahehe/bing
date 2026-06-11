@@ -24,7 +24,7 @@
 #define SYS_CLK_SEL                     SYS_24M                 //选择系统时钟
 #define BUCK_MODE_EN                    1                       //是否BUCK MODE, 0:LDO MODE  1:BUCK MODE
 #define WK0_10S_RESET                   1                       //WK pin 10秒复位功能
-#define SYS_SLEEP_EN                    1                       //系统休眠使能
+#define SYS_SLEEP_EN                    0                       //系统休眠使能
 #define SYS_SLEEP_TIME                  5                       //自动休眠时间(秒), 0为不自动休眠
 #define SYS_PWROFF_MODE                 PWROFF_MODE2            //软关机模式选择，模式1 VDDIO掉电，模式2 VDDIO不掉电
 #define SYS_OFF_TIME                    0                       //自动关机时间(秒), 0为不自动关机

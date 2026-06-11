@@ -2,7 +2,8 @@
 #include "driver_saradc.h"
 #include "bsp_saradc.h"
 #include "bsp_saradc_vbat.h"
-
+#include "bsp_ntc.h"
+#define BSP_NTC_EN                      1  
 #if BSP_SARADC_EN
 
 void bsp_saradc_init(void)
@@ -32,5 +33,11 @@ void bsp_saradc_process(void)
         bsp_vbat_proc();
     }
 #endif
+
+#if BSP_NTC_EN
+    bsp_ntc_process();
+#endif
 }
 #endif
+
+

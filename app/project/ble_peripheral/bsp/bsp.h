@@ -14,6 +14,10 @@
 #include "bsp_charge.h"
 #include "bsp_huart_iodm.h"
 #include "bsp_saradc_tsensor.h"
+#include "bsp_ntc.h"
+#include "bsp_display188.h"
+#include "bsp_fan.h"
+#include "bsp_tec.h"
 #include "func.h"
 #include "msg.h"
 

@@ -1,11 +1,17 @@
 #include "include.h"
 #include "driver_lowpwr.h"
 #include "bsp_saradc_key.h"
+#include "bsp_ntc.h"
+#include "bsp_tec.h"
+#include "bsp_fan.h"
+#include "app_temp_control.h"
+#if BSP_DISPLAY188_EN
+#include "bsp_display188.h"
+#endif
 
 #if DONGLE_AUTH_EN
 bool dongle_uid_entryption_check(void);
 #endif
-
 xcfg_cb_t xcfg_cb;
 sys_cb_t sys_cb AT(.buf.bsp.sys_cb);
 u16 tmr5ms_cnt;
@@ -188,6 +194,11 @@ void bsp_sys_init(void)
     bsp_vbat_detect_init();
 #endif // BSP_VBAT_DETECT_EN
 
+#if BSP_NTC_EN
+    bsp_ntc_init();
+#endif
+    bsp_fan_init();
+    bsp_tec_init();
     power_on_check();
 
     // clock init
@@ -219,6 +230,16 @@ void bsp_sys_init(void)
 #if TONE_PLAY_EN
     bsp_tone_play_init();
 #endif
+
+#if BSP_DISPLAY188_EN
+    // ★ 显示初始化放在最后: 必须在所有外设(尤其是SARADC)之后,
+    //    否则PA口dir寄存器会被SARADC的saradc_patch()覆盖
+    bsp_display188_init();
+#endif
+
+    // ★ 应用层温度控制系统初始化
+    //    必须在所有BSP外设初始化完成之后调用
+    app_temp_control_init();
 
     printf("%s\n",__func__);
 
