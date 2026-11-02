@@ -12,6 +12,15 @@
 #define R2_CHANGE_STEP_CODE     5       /* 变化 >= 1.0℃（=5 个编码单位）才上报 */
 #define R2_CODE_INVALID         0xFFFF
 
+/* 连接参数：连上后 1.5s 发起，12ms -> 300ms（客户协议 4.4） */
+#define R2_CONN_UPDATE_DELAY_MS 1500
+#define R2_CONN_INTERVAL        240     /* 240 * 1.25ms = 300ms */
+#define R2_CONN_LATENCY         0
+#define R2_CONN_TIMEOUT         500     /* 500 * 10ms = 5s */
+
+static u8  r2_conn_pending;
+static u32 r2_conn_tick;
+
 #define R2_UNIT_C               0x01
 #define R2_UNIT_F               0x02
 
@@ -176,8 +185,12 @@ static uint16_t r2_read_callback(uint16_t con_handle, uint16_t attribute_handle,
 
 static void r2_event_callback(uint8_t event_type, uint8_t *param, uint16_t size)
 {
-    if (event_type == BLE_EVT_DISCONNECT) {
-        r2_notify_cccd = 0;
+    if (event_type == BLE_EVT_CONNECT) {
+        r2_conn_pending = 1;
+        r2_conn_tick    = tick_get();
+    } else if (event_type == BLE_EVT_DISCONNECT) {
+        r2_notify_cccd  = 0;
+        r2_conn_pending = 0;
     }
 }
 
@@ -204,6 +217,18 @@ void ble_r2_service_proc(void)
 {
     u8 code;
     int diff;
+
+    /* ---- connection parameter update: once, ~1.5s after connect ---- */
+    if (r2_conn_pending && ble_cb.con_handle &&
+        tick_check_expire(r2_conn_tick, R2_CONN_UPDATE_DELAY_MS)) {
+        r2_conn_pending = 0;
+        if (ble_update_conn_param(ble_cb.con_handle, R2_CONN_INTERVAL,
+                                  R2_CONN_LATENCY, R2_CONN_TIMEOUT)) {
+            printf("[BLE] conn param -> %dms\n", R2_CONN_INTERVAL * 125 / 100);
+        } else {
+            printf("[BLE] conn param update failed\n");
+        }
+    }
 
     if (!(r2_notify_cccd & 0x0001) || !ble_cb.con_handle) {
         return;
