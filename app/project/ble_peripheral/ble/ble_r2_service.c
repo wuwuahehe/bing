@@ -18,6 +18,15 @@
 #define R2_CONN_LATENCY         0
 #define R2_CONN_TIMEOUT         500     /* 500 * 10ms = 5s */
 
+/* ---- 目标温度掉电保存：只在值真正变化时写，并去抖 2s ---- */
+#define R2_NVM_SAVE_DEBOUNCE    2000    /* ms */
+#define R2_NVM_MAGIC            0x52    /* 'R' */
+#define R2_NVM_PAGE             BLE_CM_1_PAGE(0)   /* PAGE2，未被 SDK 占用 */
+
+static u8  r2_nvm_dirty;
+static u32 r2_nvm_tick;
+static u8  r2_last_saved_temp = 0xFF;
+
 static u8  r2_conn_pending;
 static u32 r2_conn_tick;
 
@@ -123,6 +132,46 @@ static void r2_report_target(void)
             0x00);
 }
 
+/* ==================== 掉电保存 ==================== */
+
+static u8 r2_nvm_crc(u8 *d, u8 n)
+{
+    return r2_crc8(d, n);
+}
+
+static void r2_nvm_save(u8 set_temp)
+{
+    u8 buf[4];
+
+    buf[0] = R2_NVM_MAGIC;
+    buf[1] = set_temp;
+    buf[2] = 0;
+    buf[3] = r2_nvm_crc(buf, 3);
+
+    cm_write(buf, R2_NVM_PAGE, sizeof(buf));
+    cm_sync();
+    r2_last_saved_temp = set_temp;
+    printf("[BLE] nvm save set=%d\n", set_temp);
+}
+
+static void r2_nvm_load(void)
+{
+    u8 buf[4];
+
+    cm_read(buf, R2_NVM_PAGE, sizeof(buf));
+    if (buf[0] != R2_NVM_MAGIC || buf[3] != r2_nvm_crc(buf, 3)) {
+        printf("[BLE] nvm empty/invalid\n");
+        return;
+    }
+    if (buf[1] < 2 || buf[1] > 50) {
+        printf("[BLE] nvm out of range %d\n", buf[1]);
+        return;
+    }
+    r2_last_saved_temp = buf[1];
+    app_temp_control_set_temp_c(buf[1]);
+    printf("[BLE] nvm load set=%d\n", buf[1]);
+}
+
 /* ==================== 写回调 ==================== */
 
 static int r2_write_callback(uint16_t con_handle, uint16_t attribute_handle,
@@ -151,7 +200,11 @@ static int r2_write_callback(uint16_t con_handle, uint16_t attribute_handle,
     case R2_CMD_SET_TARGET:
         if (buffer_size >= 2) {
             int c = r2_c_from_code(buffer[1]);
-            app_temp_control_set_temp_c(c);
+            if (c != app_temp_control_get_set_temp()) {
+                app_temp_control_set_temp_c(c);
+                r2_nvm_dirty = 1;          /* 值真变化才写 */
+                r2_nvm_tick  = tick_get(); /* 去抖：滑块流式下发只写最后一次 */
+            }
             printf("[BLE] set target %d C (code %d)\n", c, buffer[1]);
         }
         /* 客户协议：0x01 无 ACK */
@@ -208,9 +261,13 @@ void ble_r2_service_init(void)
     att_server_register_service_handler(&r2_service);
 
     r2_notify_cccd = 0;
+    r2_conn_pending = 0;
+    r2_nvm_dirty   = 0;
     r2_last_code   = R2_CODE_INVALID;
     r2_tick_10s    = tick_get();
     r2_tick_chg    = tick_get();
+
+    r2_nvm_load();   /* 上电恢复目标温度 */
 }
 
 void ble_r2_service_proc(void)
@@ -227,6 +284,15 @@ void ble_r2_service_proc(void)
             printf("[BLE] conn param -> %dms\n", R2_CONN_INTERVAL * 125 / 100);
         } else {
             printf("[BLE] conn param update failed\n");
+        }
+    }
+
+    /* ---- 掉电保存：变化后静止 2s 再写 ---- */
+    if (r2_nvm_dirty && tick_check_expire(r2_nvm_tick, R2_NVM_SAVE_DEBOUNCE)) {
+        u8 t = (u8)app_temp_control_get_set_temp();
+        r2_nvm_dirty = 0;
+        if (t != r2_last_saved_temp) {
+            r2_nvm_save(t);
         }
     }
 
