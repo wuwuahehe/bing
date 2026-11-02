@@ -8,6 +8,10 @@
 
 #define RECHARGE_THRESHOLD                      (4050)      //4.05V, avoid micro charge cycles
 
+/* TEC/充电互斥状态 */
+static bool charge_active   = true;
+static u8   charge_skip_cnt = 0;   /* 切换后屏蔽几次状态打印 */
+
 const char charge_status_info[][29] = {
     "[charge] uninitialized\n",
     "[charge] vusb disconnected\n",
@@ -43,7 +47,10 @@ void bsp_charge_process(void)
     u8 charge_status = charge_status_last;
 
     charge_status = charge_get_status();
-    if (charge_status != charge_status_last) {
+    if (charge_skip_cnt) {
+        charge_skip_cnt--;
+        charge_status_last = charge_status;   /* 静默同步，不打印 */
+    } else if (charge_status != charge_status_last) {
         charge_status_last = charge_status;
         printf(charge_status_info[charge_status]);
     }
@@ -80,7 +87,6 @@ void bsp_charge_process(void)
 
 
 /* ==================== TEC / 充电互斥 ==================== */
-static bool charge_active = true;
 
 /*
  * TEC 开着时暂停充电：
@@ -95,6 +101,7 @@ void bsp_charge_set_active(bool active)
         return;
     }
     charge_active = active;
+    charge_skip_cnt = 8;   /* 同步器"重启后的 UNINIT/OFF 不要打印 */
     if (active) {
         bsp_charge_init();
         printf("[charge] resume (TEC off)\r\n");
@@ -102,6 +109,17 @@ void bsp_charge_set_active(bool active)
         charge_deinit();
         printf("[charge] suspend (TEC on)\r\n");
     }
+}
+
+
+uint8_t bsp_charge_get_status(void)
+{
+    return charge_get_status();
+}
+
+bool bsp_charge_is_active(void)
+{
+    return charge_active;
 }
 
 #endif // BSP_CHARGE_EN

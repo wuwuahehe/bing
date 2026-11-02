@@ -429,7 +429,22 @@ void app_temp_control_process(void)
 
     // 3. 设置模式超时检查
     /* ---- TEC / 充电互斥：TEC 运行时暂停充电 ---- */
-    bsp_charge_set_active(g_tec != TEC_RUN);
+    {
+        static u8 chg_suspend = 0;
+        u16 vusb;
+        if (g_tec == TEC_RUN) {
+            vusb = bsp_get_vusb_mv();
+            /* VBUS 不够才让路：<4.6V 暂停，>4.8V 恢复（滞回） */
+            if (!chg_suspend && vusb < 4600) {
+                chg_suspend = 1;
+            } else if (chg_suspend && vusb > 4800) {
+                chg_suspend = 0;
+            }
+        } else {
+            chg_suspend = 0;
+        }
+        bsp_charge_set_active(!chg_suspend);
+    }
 
     check_setting_timeout();
 
@@ -445,10 +460,10 @@ void app_temp_control_process(void)
         dbg_cnt++;
         if (dbg_cnt >= 10) {
             dbg_cnt = 0;
-            printf("[T] ntc=%d vntc=%dmV vbat=%dmV vusb=%dmV soc=%d%% pwr=%d disp=%d unit=%c set=%d tec=%d ready=%d\n",
+            printf("[T] ntc=%d vntc=%dmV vbat=%dmV vusb=%dmV soc=%d%% pwr=%d chg=%d disp=%d unit=%c set=%d tec=%d ready=%d\n",
                    bsp_ntc_get_temperature(), bsp_ntc_get_voltage(),
                    power_mode_get_vbat(), bsp_get_vusb_mv(), power_mode_get_soc(),
-                   (int)power_mode_get(),
+                   (int)power_mode_get(), (int)bsp_charge_get_status(),
                    app_temp_control_get_display_temp(),
                    (g_unit == TEMP_UNIT_C) ? 'C' : 'F',
                    g_set_temp_c, (int)g_tec, (int)g_ntc_ready);
