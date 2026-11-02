@@ -4,6 +4,7 @@
 #include "bsp_display188.h"
 #include "bsp_tec.h"
 #include "bsp_fan.h"
+#include "bsp_charge.h"
 
 /* ==================== 内部状态 ==================== */
 static temp_state_t g_state = TEMP_STATE_IDLE;     // 系统状态
@@ -426,6 +427,9 @@ void app_temp_control_process(void)
     }
 
     // 3. 设置模式超时检查
+    /* ---- TEC / 充电互斥：TEC 运行时暂停充电 ---- */
+    bsp_charge_set_active(g_tec != TEC_RUN);
+
     check_setting_timeout();
 
     // 4. NTC到达设定温度检查(到达则锁定显示)

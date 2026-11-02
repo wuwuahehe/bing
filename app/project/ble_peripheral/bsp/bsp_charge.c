@@ -78,4 +78,30 @@ void bsp_charge_process(void)
     }
 }
 
+
+/* ==================== TEC / 充电互斥 ==================== */
+static bool charge_active = true;
+
+/*
+ * TEC 开着时暂停充电：
+ *   原因：无 power path，TEC 2.1A 会把 5V 拉到限流，
+ *         导致充电器反复报 vusb disconnected / LINE VOLTAGE ERROR。
+ *   做法：charge_deinit() 只清 RTCCON8 一位，不影响
+ *         charge_detect_dc()（读 RTCCON），插拔电检测仍然正常。
+ */
+void bsp_charge_set_active(bool active)
+{
+    if (active == charge_active) {
+        return;
+    }
+    charge_active = active;
+    if (active) {
+        bsp_charge_init();
+        printf("[charge] resume (TEC off)\r\n");
+    } else {
+        charge_deinit();
+        printf("[charge] suspend (TEC on)\r\n");
+    }
+}
+
 #endif // BSP_CHARGE_EN
