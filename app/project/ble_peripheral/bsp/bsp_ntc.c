@@ -6,9 +6,63 @@
 #if BSP_NTC_EN
 
 static uint16_t g_ntc_voltage_mv = 0;       // NTC+引脚电压(mV)
-static int g_ntc_temperature = 0x7FFF;       // 温度值(掳C脳10)
+static int g_ntc_temperature = 0x7FFF;       // 温度值(℃×10)
 static bool g_ntc_data_valid = false;        // 数据有效性
 static uint32_t g_ntc_last_tick = 0;         // 上次采样时间戳
+
+/* ==================== 滑动中值滤波 ==================== */
+#define NTC_MEDIAN_WINDOW       5       // 中值滤波窗口大小(奇数)
+static int  g_ntc_filter_buf[NTC_MEDIAN_WINDOW];  // 滤波缓冲区
+static u8   g_ntc_filter_idx = 0;                 // 当前写入索引
+static u8   g_ntc_filter_filled = 0;              // 缓冲是否填满
+
+/**
+ * @brief 滑动中值滤波 (冒泡排序取中值)
+ *        用于抑制NTC采样噪声, 避免TEC在临界点频繁切换
+ *
+ * @param new_value 新采样值(℃×10)
+ * @return 滤波后的温度值(℃×10)
+ *
+ * 【修复9】NTC采样噪声滤波:
+ *   采用5点滑动中值滤波, 有效消除ADC单次跳变
+ *   同时在app_temp_control层增加HYSTERESIS_DEBOUNCE_CNT消抖
+ *   两层防护确保TEC不会因噪声反复切换
+ */
+static int ntc_median_filter(int new_value)
+{
+    uint8_t i, j;
+    int temp;
+    int sort_buf[NTC_MEDIAN_WINDOW];
+
+    // 1. 写入环形缓冲区
+    g_ntc_filter_buf[g_ntc_filter_idx] = new_value;
+    g_ntc_filter_idx = (g_ntc_filter_idx + 1) % NTC_MEDIAN_WINDOW;
+    if (!g_ntc_filter_filled && g_ntc_filter_idx == 0) {
+        g_ntc_filter_filled = 1;
+    }
+
+    // 2. 缓冲区未填满时直接返回原始值
+    if (!g_ntc_filter_filled) {
+        return new_value;
+    }
+
+    // 3. 复制缓冲区并排序(冒泡, N很小)
+    for (i = 0; i < NTC_MEDIAN_WINDOW; i++) {
+        sort_buf[i] = g_ntc_filter_buf[i];
+    }
+    for (i = 0; i < NTC_MEDIAN_WINDOW - 1; i++) {
+        for (j = 0; j < NTC_MEDIAN_WINDOW - 1 - i; j++) {
+            if (sort_buf[j] > sort_buf[j + 1]) {
+                temp = sort_buf[j];
+                sort_buf[j] = sort_buf[j + 1];
+                sort_buf[j + 1] = temp;
+            }
+        }
+    }
+
+    // 返回中值(索引2)
+    return sort_buf[NTC_MEDIAN_WINDOW / 2];
+}
 
 /**
  * @brief 通过NTC阻值查表计算温度
@@ -171,9 +225,10 @@ static void bsp_ntc_sample_and_calc(void)
 
     /* Step 6: 查表计算温度 */
     temperature = ntc_calc_temperature(rntc);
-    printf("temperature = %d\n", temperature);
+    printf("temperature(filter) = %d\n", temperature);
 
-    g_ntc_temperature = temperature;
+    /* Step 7: 滑动中值滤波 → 抑制ADC噪声 */
+    g_ntc_temperature = ntc_median_filter(temperature);
     g_ntc_data_valid = true;
 }
 

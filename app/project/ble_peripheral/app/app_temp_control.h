@@ -9,6 +9,18 @@
 #define TEMP_SET_DEFAULT        8       // 默认设置温度(℃)
 #define TEMP_HYSTERESIS         2       // 滞后温度(℃): set±2
 
+/* ==================== 华氏度范围 ==================== */
+// 2℃ = 35.6℉ ≈ 36℉, 20℃ = 68℉
+#define TEMP_SET_MIN_F          36      // 设置温度最小值(℉)
+#define TEMP_SET_MAX_F          68      // 设置温度最大值(℉)
+
+/* ==================== 设置超时 ==================== */
+#define SETTING_TIMEOUT_MS      5000    // 设置模式无操作超时(ms)
+#define SETTING_TIMEOUT_STEPS   (SETTING_TIMEOUT_MS / 100)  // process每100ms调用一次
+
+/* ==================== 迟滞消抖 ==================== */
+#define HYSTERESIS_DEBOUNCE_CNT 3       // 连续N次采样确认后才切换TEC状态
+
 /* ==================== 系统状态机 ==================== */
 typedef enum {
     TEMP_STATE_IDLE = 0,        // 正常运行: 显示NTC温度, 恒温控制

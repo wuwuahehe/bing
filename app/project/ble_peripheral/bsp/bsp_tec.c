@@ -95,14 +95,25 @@ float bsp_tec_get_current(void)
 }
 
 /* ==================== 控制接口 ==================== */
+
+/**
+ * 【修复10】tec_fault逻辑bug:
+ *   原代码 bsp_tec_off() 中竟然检查 if (tec_fault) return;
+ *   导致过流故障时无法关闭TEC! 正确的逻辑是:
+ *   - bsp_tec_off() 必须无条件执行, 故障时更应关闭
+ *   - bsp_tec_on() 在故障时禁止开启
+ */
 void bsp_tec_off(void)
 {
-    if (tec_fault) return;               // 故障时不允许开启
-    gpio_reset_bits(TEC_PORT, TEC_PIN);  // PB4 = 0，PMOS 截止
+    gpio_reset_bits(TEC_PORT, TEC_PIN);  // PB4 = 0，PMOS 截止（无条件执行）
 }
 
 void bsp_tec_on(void)
 {
+    if (tec_fault) {
+        // 过流故障时禁止开启TEC
+        return;
+    }
     gpio_set_bits(TEC_PORT, TEC_PIN);    // PB4 = 1，PMOS 导通
 }
 

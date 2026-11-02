@@ -29,7 +29,7 @@
 #define SYS_PWROFF_MODE                 PWROFF_MODE2            //软关机模式选择，模式1 VDDIO掉电，模式2 VDDIO不掉电
 #define SYS_OFF_TIME                    0                       //自动关机时间(秒), 0为不自动关机
 #define SYS_PWRUP_TIME                  0                       //长按开机时间(毫秒), 0为立即开机
-#define BSP_UART_DEBUG_EN               GPIO_PB3                //串口打印调试使能[Baud=1500000]
+#define BSP_UART_DEBUG_EN               GPIO_NULL                //串口打印调试使能[Baud=1500000]
 #define BSP_ADKEY_EN                    0                       //AD按键使能[Default: PB0]
 #define BSP_IOKEY_EN                    1                       //IO按鍵使能[WK0:PP;]
 #define BSP_TOUCH_KEY_EN                0                       //触摸按键功能

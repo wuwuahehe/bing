@@ -38,6 +38,12 @@
 #define NTC_SAMPLE_INTERVAL_MS          1000    // 采样间隔(ms)
 
 /**
+ * @brief 滑动中值滤波窗口大小
+ *        用于抑制NTC采样噪声, 在bsp_ntc.c和app_temp_control.c中共同使用
+ */
+#define NTC_MEDIAN_WINDOW               5       // 中值滤波窗口大小(奇数)
+
+/**
  * @brief NTC ADC通道 = PA6 = Channel 4
  */
 #define NTC_ADC_CHANNEL                 ADC_CHANNEL_PA6
