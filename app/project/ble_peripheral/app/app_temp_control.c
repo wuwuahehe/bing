@@ -421,6 +421,8 @@ void app_temp_control_process(void)
             g_tec = TEC_STOP;
             g_tec_debounce_cnt = 0;
         }
+        /* battery mode: show real temperature (client: touch -> real temp) */
+        g_display_locked = 0;
     }
 
     // 3. 设置模式超时检查
