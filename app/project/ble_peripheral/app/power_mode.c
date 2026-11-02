@@ -29,7 +29,6 @@ static pwr_mode_t g_pwr_mode = PWR_INIT;
 
 static u8  g_dc_cnt;            /* 去抖计数 */
 static u8  g_dc_online;         /* 去抖后的插电状态 */
-static u8  g_dc_raw_last;       /* 上一次原始值，用于变化检测 */
 
 static u32 g_vbat_tick;
 static u16 g_vbat_buf[VBAT_FILTER_LEN];
@@ -88,7 +87,6 @@ void power_mode_init(void)
     g_pwr_mode    = PWR_INIT;
     g_dc_cnt      = 0;
     g_dc_online   = 0;
-    g_dc_raw_last = 0;
     g_vbat_tick   = tick_get();
     g_vbat_idx    = 0;
     g_vbat_filled = 0;
@@ -128,21 +126,26 @@ void power_mode_process(void)
         if (++g_dc_cnt >= DC_DEBOUNCE_CNT) {
             g_dc_cnt    = 0;
             g_dc_online = dc_raw;
-            power_mode_enter_online();
-            if (!g_dc_online) {
+            if (g_dc_online) {
+                power_mode_enter_online();
+            } else {
                 power_mode_enter_battery();
             }
         }
     } else {
         g_dc_cnt = 0;
     }
-    g_dc_raw_last = dc_raw;
 
     /* ---------- 2. 电池采样（500ms） ---------- */
     if (tick_check_expire(g_vbat_tick, VBAT_SAMPLE_MS)) {
         u16 mv;
         g_vbat_tick = tick_get();
         mv = vbat_filter_push(bsp_get_vbat_level(1));
+        /* invalid sample guard: <1500mV means ADC not ready / fault */
+        if (mv < 1500) {
+            g_vbat_low_cnt = 0;
+            return;
+        }
 
         /*
          * 低电判定条件（比 PRD 更保守）：

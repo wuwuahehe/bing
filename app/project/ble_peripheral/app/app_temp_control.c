@@ -214,11 +214,15 @@ static void update_display(void)
 static void fan_control(void)
 {
     static u8 fan_initialized = 0;
-    if (!fan_initialized) {
-        bsp_fan_set(1);
-        fan_initialized = 1;
-        printf("[FAN] Always ON\r\n");
+    /* not plugged: leave it to the process() fallback */
+    if (!power_mode_allow_cool()) {
+        return;
     }
+    if (!fan_initialized) {
+        fan_initialized = 1;
+        printf("[FAN] ON\r\n");
+    }
+    bsp_fan_set(1);   /* re-assert: recover after re-plug */
 }
 
 /**
@@ -448,7 +452,8 @@ void app_temp_control_process(void)
  */
 void app_temp_control_flash_toggle(void)
 {
-    if (g_state == TEMP_STATE_SETTING) {
+    /* charging or setting mode: 1Hz blink */
+    if (g_state == TEMP_STATE_SETTING || power_mode_is_charging()) {
         g_flash_on = !g_flash_on;
     } else {
         g_flash_on = 1;
