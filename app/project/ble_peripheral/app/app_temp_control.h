@@ -87,4 +87,5 @@ void app_temp_control_process(void);
  */
 u8 app_temp_control_get_flash_state(void);
 
+void app_temp_control_on_pp_double(void);
 #endif // __APP_TEMP_CONTROL_H__

@@ -23,6 +23,10 @@ static u8   g_tec_debounce_cnt = 0;                 // TEC切换消抖计数器
 
 /* ==================== 显示锁定标志 ==================== */
 static u8   g_display_locked = 0;                   // 0=初始终端显示NTC, 1=锁定显示设定温度
+/* ---- 灭屏待机：仅电池模式有效（客户 P1/P2） ---- */
+#define SCREEN_OFF_TIMEOUT_MS   5000
+static u8   g_screen_off   = 0;   /* 1 = 灭屏待机 */
+static u32  g_activity_tick = 0;  /* 最后一次操作时刻 */
                                                     // 用户长按进设置后,退出即锁定恒温显示
 
 static u8   g_ntc_ready = 0;   // 【新增】：NTC真实数据就绪标志 (0=未就绪, 1=已拿到真实数据)
@@ -92,6 +96,16 @@ u8 app_temp_control_get_flash_state(void)
 /**
  * @brief PP短按处理
  */
+/* 记录一次用户操作，并唤醒灭屏 */
+static void screen_activity_touch(void)
+{
+    g_activity_tick = tick_get();
+    if (g_screen_off) {
+        g_screen_off = 0;
+        printf("[DISP] screen on\r\n");
+    }
+}
+
 void app_temp_control_on_pp_short(void)
 {
     if (g_state == TEMP_STATE_SETTING) {
@@ -118,17 +132,32 @@ void app_temp_control_on_pp_short(void)
         g_setting_idle_cnt = 0;
 
     } else {
-        // ========== 正常运行模式: 切换单位 ==========
-        g_unit = (g_unit == TEMP_UNIT_C) ? TEMP_UNIT_F : TEMP_UNIT_C;
-        printf("[APP] Unit switch to %s\r\n", (g_unit == TEMP_UNIT_C) ? "C" : "F");
+        /* 客户 P2：待机（灭屏）单击点亮；亮屏单击仅刷新灭屏计时 */
+        screen_activity_touch();
     }
 }
 
 /**
  * @brief PP长按处理
  */
+/* 客户 P3：亮屏情况下双击切换 ℃/℉ */
+void app_temp_control_on_pp_double(void)
+{
+    screen_activity_touch();
+    if (g_state == TEMP_STATE_SETTING) {
+        return;
+    }
+    g_unit = (g_unit == TEMP_UNIT_C) ? TEMP_UNIT_F : TEMP_UNIT_C;
+    printf("[APP] Unit switch to %s\r\n", (g_unit == TEMP_UNIT_C) ? "C" : "F");
+}
+
 void app_temp_control_on_pp_long(void)
 {
+    /* 灭屏时长按只唤醒，不进设置 */
+    if (g_screen_off) {
+        screen_activity_touch();
+        return;
+    }
     if (g_state == TEMP_STATE_IDLE) {
         // 长按进入设置模式
         g_state = TEMP_STATE_SETTING;
@@ -139,6 +168,8 @@ void app_temp_control_on_pp_long(void)
     } else if (g_state == TEMP_STATE_SETTING) {
         // 长按退出设置模式, 保存设置
         g_state = TEMP_STATE_IDLE;
+    g_screen_off      = 0;
+    g_activity_tick   = tick_get();
         g_flash_on = 1;
         g_setting_idle_cnt = 0;
         // 退出设置时解除显示锁定, 让屏幕跟随NTC温度变化
@@ -161,6 +192,12 @@ static void update_display(void)
     int disp_val;
     int d1, d2, d3;
     int dp1, dp2;
+
+    /* 灭屏待机：数码管全灭 */
+    if (g_screen_off) {
+        bsp_display188_set_digit(10, 10, 10, 0, 0);
+        return;
+    }
 
     disp_val = app_temp_control_get_display_temp();
     dp1 = (g_unit == TEMP_UNIT_C) ? 1 : 0;
@@ -444,6 +481,15 @@ void app_temp_control_process(void)
             chg_suspend = 0;
         }
         bsp_charge_set_active(!chg_suspend);
+    }
+
+    /* ---- 仅电池模式才灭屏；插电常亮（客户 P5：充电单位闪/充满常亮） ---- */
+    if (power_mode_dc_online()) {
+        g_screen_off = 0;
+    } else if (!g_screen_off && g_state != TEMP_STATE_SETTING &&
+               tick_check_expire(g_activity_tick, SCREEN_OFF_TIMEOUT_MS)) {
+        g_screen_off = 1;
+        printf("[DISP] screen off (battery, 5s)\r\n");
     }
 
     check_setting_timeout();

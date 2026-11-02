@@ -91,8 +91,8 @@ void func_message(u16 msg)
             printf("PP key long up\n");
             break;
 
-        case KEY_ID_PP | KEY_DOUBLE:        // PP双击
-            printf("PP key double down\n");
+        case KEY_ID_PP | KEY_DOUBLE:        // PP双击 -> 切换单位
+            app_temp_control_on_pp_double();
             break;
 
         case KEY_ID_PP | KEY_THREE:         // PP三击
