@@ -2,6 +2,7 @@
 #include "dec.h"
 #include "app_temp_control.h"
 #include "power_mode.h"
+#include "ble_r2_service.h"
 
 func_cb_t func_cb AT(.buf.func_cb);
 
@@ -52,6 +53,15 @@ void func_process(void)
     }
 
 #if BSP_CHARGE_EN
+    /* === R2 BLE 协议周期处理（10s 上报 / 变化上报） === */
+    {
+        static u32 r2_tick = 0;
+        if (tick_check_expire(r2_tick, 20)) {
+            r2_tick = tick_get();
+            ble_r2_service_proc();
+        }
+    }
+
     bsp_charge_process();
 #endif
 

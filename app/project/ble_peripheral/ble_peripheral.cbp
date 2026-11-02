@@ -187,6 +187,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="app/power_mode.h" />
+		<Unit filename="ble/ble_r2_service.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ble/ble_r2_service.h" />
 		<Unit filename="app/func.c">
 			<Option compilerVar="CC" />
 		</Unit>

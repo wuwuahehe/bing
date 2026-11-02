@@ -71,6 +71,25 @@ int app_temp_control_get_display_temp(void)
     return (g_unit == TEMP_UNIT_C) ? disp : celsius_to_fahrenheit(disp);
 }
 
+/* BLE 协议用：实际温度（摄氏整数） */
+int app_temp_control_get_temp_c(void)
+{
+    int c = (g_actual_temp_c + 5) / 10;
+    if (c < 0)  c = 0;
+    if (c > 50) c = 50;
+    return c;
+}
+
+/* BLE 下发设定温度：限制 2~50℃，并按界面刷新 */
+void app_temp_control_set_temp_c(int c)
+{
+    if (c < TEMP_SET_MIN) c = TEMP_SET_MIN;
+    if (c > 50)           c = 50;
+    g_set_temp_c = c;
+    g_display_locked = 0;
+    g_tec_debounce_cnt = HYSTERESIS_DEBOUNCE_CNT;
+}
+
 int app_temp_control_get_set_temp(void)
 {
     return g_set_temp_c;
