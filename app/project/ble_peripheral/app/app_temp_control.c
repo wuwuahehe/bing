@@ -72,6 +72,12 @@ int app_temp_control_get_display_temp(void)
 }
 
 /* BLE 协议用：实际温度（摄氏整数） */
+/* BLE: NTC 是否已就绪（未就绪时上报编码 0） */
+int app_temp_control_is_ntc_ready(void)
+{
+    return g_ntc_ready ? 1 : 0;
+}
+
 int app_temp_control_get_temp_c(void)
 {
     int c = (g_actual_temp_c + 5) / 10;

@@ -94,16 +94,24 @@ static u8 r2_unit_byte(void)
 
 static void r2_report_current(u8 cmd)
 {
-    int c = app_temp_control_get_temp_c();
+    int c;
 
+    /* NTC not ready: send code 0, App discards this first frame */
+    if (!app_temp_control_is_ntc_ready()) {
+        r2_send(cmd, 0x00, r2_unit_byte());
+        return;
+    }
+    c = app_temp_control_get_temp_c();
     r2_send(cmd, r2_code_from_c(c), r2_unit_byte());
 }
 
 static void r2_report_target(void)
 {
+    /* 0x83 frame: Byte2 is fixed 0x00 per protocol 7.2 (e.g. 83 28 00 06),
+       NOT the unit byte */
     r2_send(R2_RPT_TARGET,
             r2_code_from_c(app_temp_control_get_set_temp()),
-            r2_unit_byte());
+            0x00);
 }
 
 /* ==================== 写回调 ==================== */
@@ -201,7 +209,11 @@ void ble_r2_service_proc(void)
         return;
     }
 
-    code = r2_code_from_c(app_temp_control_get_temp_c());
+    if (!app_temp_control_is_ntc_ready()) {
+        code = 0x00;
+    } else {
+        code = r2_code_from_c(app_temp_control_get_temp_c());
+    }
 
     /* 10s 定时上报 */
     if (tick_check_expire(r2_tick_10s, R2_REPORT_INTERVAL_MS)) {

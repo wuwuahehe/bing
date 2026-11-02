@@ -91,4 +91,5 @@ void app_temp_control_on_pp_double(void);
 int  app_temp_control_get_temp_c(void);
 void app_temp_control_set_temp_c(int c);
 
+int  app_temp_control_is_ntc_ready(void);
 #endif // __APP_TEMP_CONTROL_H__
