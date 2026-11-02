@@ -339,11 +339,11 @@ static void hysteresis_control(void)
     tec_state_t target_state = g_tec;
 
     if (g_tec == TEC_RUN) {
-        if (ntc_c <= (g_set_temp_c - TEMP_HYSTERESIS)) {
+        if (ntc_raw <= (g_set_temp_c * 10 - TEMP_HYSTERESIS_X10)) {
             target_state = TEC_STOP;
         }
     } else {
-        if (power_mode_allow_cool() && ntc_c >= (g_set_temp_c + TEMP_HYSTERESIS)) {
+        if (power_mode_allow_cool() && ntc_raw >= (g_set_temp_c * 10 + TEMP_HYSTERESIS_X10)) {
             target_state = TEC_RUN;
         }
     }
@@ -357,11 +357,11 @@ static void hysteresis_control(void)
             if (target_state == TEC_RUN) {
                 bsp_tec_on();
                 g_tec = TEC_RUN;
-                printf("[TEC] ON (ntc=%d >= set=%d+%d)\r\n", ntc_c, g_set_temp_c, TEMP_HYSTERESIS);
+                printf("[TEC] ON (ntc10=%d >= set10=%d+%d)\r\n", ntc_raw, g_set_temp_c * 10, TEMP_HYSTERESIS_X10);
             } else {
                 bsp_tec_off();
                 g_tec = TEC_STOP;
-                printf("[TEC] OFF (ntc=%d <= set=%d-%d)\r\n", ntc_c, g_set_temp_c, TEMP_HYSTERESIS);
+                printf("[TEC] OFF (ntc10=%d <= set10=%d-%d)\r\n", ntc_raw, g_set_temp_c * 10, TEMP_HYSTERESIS_X10);
             }
             // 风扇由fan_control独立管理, TEC停止不影响风扇
         }
@@ -426,11 +426,11 @@ void app_temp_control_init(void)
         ntc_c = (ntc_raw + 5) / 10;
         g_actual_temp_c = ntc_raw;
 
-        if (ntc_c >= (g_set_temp_c + TEMP_HYSTERESIS)) {
+        if (ntc_raw >= (g_set_temp_c * 10 + TEMP_HYSTERESIS_X10)) {
             bsp_tec_on();
             g_tec = TEC_RUN;
-            printf("[TEC] Init ON (ntc=%d >= default=%d+%d)\r\n",
-                   ntc_c, g_set_temp_c, TEMP_HYSTERESIS);
+            printf("[TEC] Init ON (ntc10=%d >= set10=%d+%d)\r\n",
+                   ntc_raw, g_set_temp_c * 10, TEMP_HYSTERESIS_X10);
         }
     }
 
@@ -463,7 +463,7 @@ static void check_display_lock(void)
     // 【核心修复】：增加 g_tec == TEC_RUN 的判定
     // 只有在制冷片正在工作(降温中)，并且终于把温度压到了设定值及以下时，才锁定屏幕！
     // 如果开机室温就低于设定值，制冷片没启动(TEC_STOP)，则拒绝锁定，老老实实当温度计用！
-    if (ntc_c <= g_set_temp_c && g_tec == TEC_RUN) {
+    if (g_actual_temp_c <= (g_set_temp_c * 10) && g_tec == TEC_RUN) {
         g_display_locked = 1;
         printf("[DISP] Lock at %d℃ (ntc=%d℃)\r\n", g_set_temp_c, ntc_c);
     }

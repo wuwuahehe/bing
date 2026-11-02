@@ -7,7 +7,8 @@
 #define TEMP_SET_MIN            2       // 设置温度最小值(℃)
 #define TEMP_SET_MAX            20      // 设置温度最大值(℃)
 #define TEMP_SET_DEFAULT        8       // 默认设置温度(℃)
-#define TEMP_HYSTERESIS         2       // 滞后温度(℃): set±2
+#define TEMP_HYSTERESIS_X10     2       /* 滞后 0.2℃，单位 0.1℃（客户需求 P4） */
+#define TEMP_HYSTERESIS         (TEMP_HYSTERESIS_X10 / 10)   /* 仅供显示用，不参与比较 */
 
 /* ==================== 华氏度范围 ==================== */
 // 2℃ = 35.6℉ ≈ 36℉, 20℃ = 68℉
@@ -19,7 +20,7 @@
 #define SETTING_TIMEOUT_STEPS   (SETTING_TIMEOUT_MS / 100)  // process每100ms调用一次
 
 /* ==================== 迟滞消抖 ==================== */
-#define HYSTERESIS_DEBOUNCE_CNT 3       // 连续N次采样确认后才切换TEC状态
+#define HYSTERESIS_DEBOUNCE_CNT 10       // 连续N次采样确认后才切换TEC状态
 
 /* ==================== 系统状态机 ==================== */
 typedef enum {
