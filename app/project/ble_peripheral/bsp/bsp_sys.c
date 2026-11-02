@@ -6,6 +6,7 @@
 #include "bsp_tec.h"
 #include "bsp_fan.h"
 #include "app_temp_control.h"
+#include "power_mode.h"
 #if BSP_DISPLAY188_EN
 #include "bsp_display188.h"
 #endif
@@ -280,6 +281,7 @@ void bsp_sys_init(void)
 
     // ★ 应用层温度控制系统初始化
     //    必须在所有BSP外设初始化完成之后调用
+    power_mode_init();
     app_temp_control_init();
 
     printf("%s\n",__func__);

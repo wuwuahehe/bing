@@ -1,4 +1,5 @@
 #include "app_temp_control.h"
+#include "power_mode.h"
 #include "bsp_ntc.h"
 #include "bsp_display188.h"
 #include "bsp_tec.h"
@@ -163,6 +164,12 @@ static void update_display(void)
     dp1 = (g_unit == TEMP_UNIT_C) ? 1 : 0;
     dp2 = (g_unit == TEMP_UNIT_F) ? 1 : 0;
 
+    /* ---- charging: unit segment blinks at 1Hz (FR-UI-05) ---- */
+    if (power_mode_is_charging() && g_flash_on == 0) {
+        dp1 = 0;
+        dp2 = 0;
+    }
+
     // 设置模式下闪烁
     if (g_state == TEMP_STATE_SETTING && g_flash_on == 0) {
         bsp_display188_set_digit(10, 10, 10, dp1, dp2);
@@ -268,7 +275,7 @@ static void hysteresis_control(void)
             target_state = TEC_STOP;
         }
     } else {
-        if (ntc_c >= (g_set_temp_c + TEMP_HYSTERESIS)) {
+        if (power_mode_allow_cool() && ntc_c >= (g_set_temp_c + TEMP_HYSTERESIS)) {
             target_state = TEC_RUN;
         }
     }
@@ -401,6 +408,16 @@ void app_temp_control_process(void)
 
     // 2. 风扇控制(持续运行)
     fan_control();
+
+    /* ---- non-plugged (battery / off): force actuators off, PRD FR-MODE-02 ---- */
+    if (!power_mode_allow_cool()) {
+        bsp_tec_off();
+        bsp_fan_set(0);
+        if (g_tec == TEC_RUN) {
+            g_tec = TEC_STOP;
+            g_tec_debounce_cnt = 0;
+        }
+    }
 
     // 3. 设置模式超时检查
     check_setting_timeout();

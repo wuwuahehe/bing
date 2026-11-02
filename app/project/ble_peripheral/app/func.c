@@ -1,6 +1,7 @@
 #include "include.h"
 #include "dec.h"
 #include "app_temp_control.h"
+#include "power_mode.h"
 
 func_cb_t func_cb AT(.buf.func_cb);
 
@@ -26,6 +27,17 @@ void func_process(void)
         if (tick_check_expire(app_tick, 100)) {
             app_tick = tick_get();
             app_temp_control_process();
+
+    }
+
+    /* === power mode: plug/unplug detect, 10ms === */
+    {
+        static u32 pwr_tick = 0;
+        if (tick_check_expire(pwr_tick, 10)) {
+            pwr_tick = tick_get();
+            power_mode_process();
+        }
+
         }
     }
 

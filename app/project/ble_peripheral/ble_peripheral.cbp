@@ -183,6 +183,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="app/app_temp_control.h" />
+		<Unit filename="app/power_mode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="app/power_mode.h" />
 		<Unit filename="app/func.c">
 			<Option compilerVar="CC" />
 		</Unit>
