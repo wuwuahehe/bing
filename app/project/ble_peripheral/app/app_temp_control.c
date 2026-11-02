@@ -438,8 +438,10 @@ void app_temp_control_process(void)
         dbg_cnt++;
         if (dbg_cnt >= 10) {
             dbg_cnt = 0;
-            printf("[T] ntc=%d vntc=%dmV disp=%d unit=%c set=%d tec=%d ready=%d\n",
+            printf("[T] ntc=%d vntc=%dmV vbat=%dmV soc=%d%% pwr=%d disp=%d unit=%c set=%d tec=%d ready=%d\n",
                    bsp_ntc_get_temperature(), bsp_ntc_get_voltage(),
+                   power_mode_get_vbat(), power_mode_get_soc(),
+                   (int)power_mode_get(),
                    app_temp_control_get_display_temp(),
                    (g_unit == TEMP_UNIT_C) ? 'C' : 'F',
                    g_set_temp_c, (int)g_tec, (int)g_ntc_ready);

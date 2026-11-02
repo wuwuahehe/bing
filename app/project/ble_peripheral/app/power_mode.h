@@ -30,6 +30,12 @@ bool       power_mode_allow_cool(void);
 /* 当前是否处于充电中（用于单位段 1Hz 闪烁） */
 bool       power_mode_is_charging(void);
 
+/* 电池电压（mV，5 点平均） */
+u16        power_mode_get_vbat(void);
+
+/* 粗略电量百分比（0-100，仅供调试参考） */
+u8         power_mode_get_soc(void);
+
 /* 去抖后的插电状态（1=插着） */
 bool       power_mode_dc_online(void);
 

@@ -37,6 +37,7 @@ static u16 g_vbat_buf[VBAT_FILTER_LEN];
 static u8  g_vbat_idx;
 static u8  g_vbat_filled;
 static u8  g_vbat_low_cnt;
+static u16 g_vbat_mv;             /* 滤波后的 VBAT(mV) */
 static u8  g_full_cnt;           /* 充满连续计数 */
 static u32 g_mode_tick;          /* 进入当前状态的时刻 */
 
@@ -115,6 +116,30 @@ bool power_mode_is_charging(void)
     return (g_pwr_mode == PWR_CHARGING);
 }
 
+u16 power_mode_get_vbat(void)
+{
+    return g_vbat_mv;
+}
+
+/* 1S 锂电电压->电量粗估，仅供调试参考 */
+u8 power_mode_get_soc(void)
+{
+    static const u16 v[] = {4200, 4100, 4000, 3900, 3800, 3700, 3600, 3500, 3400, 3300, 3000};
+    static const u8  s[] = {100,  90,   80,   70,   55,   40,   25,   15,   8,    3,    0};
+    u8 i;
+
+    if (g_vbat_mv >= v[0])  return 100;
+    if (g_vbat_mv <= v[10]) return 0;
+    for (i = 0; i < 10; i++) {
+        if (g_vbat_mv <= v[i] && g_vbat_mv >= v[i + 1]) {
+            u16 dv = v[i] - v[i + 1];
+            u16 dn = v[i] - g_vbat_mv;
+            return (u8)(s[i] - (u8)((u16)(s[i] - s[i + 1]) * dn / dv));
+        }
+    }
+    return 0;
+}
+
 bool power_mode_dc_online(void)
 {
     return g_dc_online ? true : false;
@@ -147,6 +172,7 @@ void power_mode_process(void)
         u16 mv;
         g_vbat_tick = tick_get();
         mv = vbat_filter_push(bsp_get_vbat_level(1));
+        g_vbat_mv = mv;
         /* invalid sample guard: <1500mV means ADC not ready / fault */
         if (mv < 1500) {
             g_vbat_low_cnt = 0;
