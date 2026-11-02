@@ -23,7 +23,8 @@ void bsp_vbat_detect_init(void)
 {
     saradc_channel_init_typedef saradc_channel_init_struct;
 
-    saradc_channel_init_struct.channel = ADC_CHANNEL_VBAT | VBAT_DETECT_ASSIST_CHANNEL;
+    /* VUSB 一并在这里初始化一次，后续只 kick_start，避免重配冲掉 NTC 通道 */
+    saradc_channel_init_struct.channel = ADC_CHANNEL_VBAT | ADC_CHANNEL_VUSB | VBAT_DETECT_ASSIST_CHANNEL;
     saradc_channel_init_struct.pullup_en = SARADC_PULLUP_DIS;
     saradc_channel_init_struct.setup_time = SARADC_ST_8_CLK;
     saradc_channel_init_struct.interrupt_en = DISABLE;
@@ -126,6 +127,25 @@ uint16_t bsp_get_vbat_level(u8 mode)
     } else {
         return vbat_voltage;
     }
+}
+
+
+/* 读 VBUS 电压（mV）：与 VBAT 相同的比值法，以 VRTC \e4��参考 */
+uint16_t bsp_get_vusb_mv(void)
+{
+    uint32_t vusb, vrtc;
+    uint32_t ch = ADC_CHANNEL_VUSB | ADC_CHANNEL_VRTC;
+
+    saradc_kick_start(ch);
+    while (!(saradc_get_channel_flag(ADC_CHANNEL_VUSB) &&
+             saradc_get_channel_flag(ADC_CHANNEL_VRTC)));
+
+    vusb = saradc_get_data(ADC_CHANNEL_VUSB);
+    vrtc = saradc_get_data(ADC_CHANNEL_VRTC);
+    if (vrtc == 0) {
+        return 0;
+    }
+    return (uint16_t)(pmu_get_vrtc24_mv() * vusb / vrtc);
 }
 
 #endif // BSP_VBAT_DETECT_EN

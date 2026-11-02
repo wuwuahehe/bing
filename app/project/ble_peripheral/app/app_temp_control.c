@@ -5,6 +5,7 @@
 #include "bsp_tec.h"
 #include "bsp_fan.h"
 #include "bsp_charge.h"
+#include "bsp_saradc_vbat.h"
 
 /* ==================== 内部状态 ==================== */
 static temp_state_t g_state = TEMP_STATE_IDLE;     // 系统状态
@@ -444,9 +445,9 @@ void app_temp_control_process(void)
         dbg_cnt++;
         if (dbg_cnt >= 10) {
             dbg_cnt = 0;
-            printf("[T] ntc=%d vntc=%dmV vbat=%dmV soc=%d%% pwr=%d disp=%d unit=%c set=%d tec=%d ready=%d\n",
+            printf("[T] ntc=%d vntc=%dmV vbat=%dmV vusb=%dmV soc=%d%% pwr=%d disp=%d unit=%c set=%d tec=%d ready=%d\n",
                    bsp_ntc_get_temperature(), bsp_ntc_get_voltage(),
-                   power_mode_get_vbat(), power_mode_get_soc(),
+                   power_mode_get_vbat(), bsp_get_vusb_mv(), power_mode_get_soc(),
                    (int)power_mode_get(),
                    app_temp_control_get_display_temp(),
                    (g_unit == TEMP_UNIT_C) ? 'C' : 'F',
