@@ -22,6 +22,8 @@
 #define VBAT_FILTER_LEN         5       /* 滑动平均点数 */
 #define VBAT_LOW_MV             3300    /* 低电阈值（FR-PWR-03） */
 #define VBAT_LOW_CONFIRM        5       /* 连续 5 次（2.5s）才关机 */
+#define VBAT_FULL_CONFIRM       10      /* 100ms 内连续判满，防单次抖动 */
+#define DIRECT_MIN_DWELL_MS     2000    /* DIRECT 至少停留 2s 才允许回充 */
 
 /* ==================== 内部状态 ==================== */
 
@@ -35,6 +37,8 @@ static u16 g_vbat_buf[VBAT_FILTER_LEN];
 static u8  g_vbat_idx;
 static u8  g_vbat_filled;
 static u8  g_vbat_low_cnt;
+static u8  g_full_cnt;           /* 充满连续计数 */
+static u32 g_mode_tick;          /* 进入当前状态的时刻 */
 
 /* ==================== 工具函数 ==================== */
 
@@ -71,6 +75,8 @@ static void power_mode_enter_battery(void)
     bsp_tec_off();
     bsp_fan_set(0);
     g_vbat_low_cnt = 0;
+    g_full_cnt    = 0;
+    g_mode_tick   = tick_get();
     printf("[PWR] unplugged -> BATTERY, TEC/FAN off\n");
 }
 
@@ -166,6 +172,8 @@ void power_mode_process(void)
 
     switch (g_pwr_mode) {
     case PWR_INIT:
+        g_mode_tick = tick_get();
+        g_full_cnt  = 0;
         if (g_dc_online) {
             g_pwr_mode = (sta == CHARGE_STA_OFF_BUT_DC_IN) ? PWR_DIRECT : PWR_CHARGING;
         } else {
@@ -177,9 +185,17 @@ void power_mode_process(void)
         if (!g_dc_online) {
             g_pwr_mode = PWR_BATTERY;
         } else if (sta == CHARGE_STA_OFF_BUT_DC_IN) {
-            /* 充满：硬件已按 FULL_DISCONNECT 转直供 */
-            g_pwr_mode = PWR_DIRECT;
-            printf("[PWR] charge full -> DIRECT\n");
+            /* 满充判定需连续确认：无电池时 VBAT 会在 ms 级反复跳变 */
+            if (g_full_cnt < VBAT_FULL_CONFIRM) {
+                g_full_cnt++;
+            }
+            if (g_full_cnt >= VBAT_FULL_CONFIRM) {
+                g_pwr_mode  = PWR_DIRECT;
+                g_mode_tick = tick_get();
+                printf("[PWR] charge full -> DIRECT\n");
+            }
+        } else {
+            g_full_cnt = 0;
         }
         break;
 
@@ -187,14 +203,20 @@ void power_mode_process(void)
         if (!g_dc_online) {
             g_pwr_mode = PWR_BATTERY;
         } else if (sta >= CHARGE_STA_ON_TRICKLE) {
-            /* 掉电后自动重充 */
-            g_pwr_mode = PWR_CHARGING;
-            printf("[PWR] recharge -> CHARGING\n");
+            /* 掉电重充：需在 DIRECT 停留足 2s，防无电池高频抖动 */
+            if (tick_check_expire(g_mode_tick, DIRECT_MIN_DWELL_MS)) {
+                g_pwr_mode  = PWR_CHARGING;
+                g_mode_tick = tick_get();
+                g_full_cnt  = 0;
+                printf("[PWR] recharge -> CHARGING\n");
+            }
         }
         break;
 
     case PWR_BATTERY:
         if (g_dc_online) {
+            g_mode_tick = tick_get();
+            g_full_cnt  = 0;
             g_pwr_mode = (sta == CHARGE_STA_OFF_BUT_DC_IN) ? PWR_DIRECT : PWR_CHARGING;
         } else if (g_vbat_low_cnt >= VBAT_LOW_CONFIRM) {
             g_pwr_mode = PWR_OFF;
@@ -210,7 +232,9 @@ void power_mode_process(void)
 
     case PWR_OFF:
         if (g_dc_online) {
-            g_pwr_mode = PWR_CHARGING;
+            g_pwr_mode  = PWR_CHARGING;
+            g_mode_tick = tick_get();
+            g_full_cnt  = 0;
             printf("[PWR] wakeup by DC -> CHARGING\n");
         }
         break;
