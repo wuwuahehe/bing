@@ -410,6 +410,20 @@ void app_temp_control_process(void)
 
     // 5. 刷新显示
     update_display();
+
+    /* ---- debug: 1 line per ~1s (process runs at 100ms) ---- */
+    {
+        static u8 dbg_cnt = 0;
+        dbg_cnt++;
+        if (dbg_cnt >= 10) {
+            dbg_cnt = 0;
+            printf("[T] ntc=%d vntc=%dmV disp=%d unit=%c set=%d tec=%d ready=%d\n",
+                   bsp_ntc_get_temperature(), bsp_ntc_get_voltage(),
+                   app_temp_control_get_display_temp(),
+                   (g_unit == TEMP_UNIT_C) ? 'C' : 'F',
+                   g_set_temp_c, (int)g_tec, (int)g_ntc_ready);
+        }
+    }
 }
 
 /**

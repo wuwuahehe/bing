@@ -10,7 +10,7 @@
 #define ADC_CURRENT_PIN     GPIO_PIN_7          // PA7 -> ADCI_M
 #define ADC_CURRENT_CH      ADC_CHANNEL_PA7     // 根据实际芯片定义
 
-#define R_SENSE             0.02f               // 采样电阻 0.02Ω
+#define R_SENSE             0.03f               // 采样电阻 0.03Ω
 #define TEC_MAX_CURRENT_A   3.0f                // 最大允许电流 3A
 #define ADC_REF_VOLTAGE     3.3f                // ADC 参考电压
 #define ADC_FULL_SCALE      1023.0f             // 10 位 ADC 满量程

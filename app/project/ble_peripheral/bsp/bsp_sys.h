@@ -23,5 +23,9 @@ void bsp_periph_init(void);
 void sys_ram_info_dump(void);
 void usr_tmr5ms_thread_do(void);
 
+
+/* Put every actuator into its safe level. Must be called first in main(). */
+void bsp_safe_state(void);
+
 #endif // _BSP_SYS_H
 

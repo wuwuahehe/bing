@@ -4,6 +4,8 @@
 
 int main(void)
 {
+    bsp_safe_state();   /* TEC/FAN off, display Hi-Z - must be first */
+
     sys_cb.rst_reason = sys_rst_init(WK0_10S_RESET);
     printf("Hello AB202X: %08x\n", sys_cb.rst_reason);
     sys_rst_dump(sys_cb.rst_reason);

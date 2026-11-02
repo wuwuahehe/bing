@@ -1,4 +1,5 @@
 #include "include.h"
+#include "board_pins.h"
 #include "driver_lowpwr.h"
 #include "bsp_saradc_key.h"
 #include "bsp_ntc.h"
@@ -15,6 +16,46 @@ bool dongle_uid_entryption_check(void);
 xcfg_cb_t xcfg_cb;
 sys_cb_t sys_cb AT(.buf.bsp.sys_cb);
 u16 tmr5ms_cnt;
+
+/*
+ * Safe power-on state. Called as the very first statement of main(), before
+ * any other init, so that no actuator can be driven by a floating/high-Z pin
+ * during reset.
+ *   TEC  -> off
+ *   FAN  -> off
+ *   DISP -> all lines high impedance (segments dark)
+ */
+void bsp_safe_state(void)
+{
+    gpio_init_typedef gpio_init_structure;
+
+    /* TEC off first: this is the only output that heats/cools and draws amps */
+    gpio_init_structure.gpio_pin  = PIN_TEC_EN_PIN;
+    gpio_init_structure.gpio_dir  = GPIO_DIR_OUTPUT;
+    gpio_init_structure.gpio_fen  = GPIO_FEN_GPIO;
+    gpio_init_structure.gpio_fdir = GPIO_FDIR_SELF;
+    gpio_init_structure.gpio_mode = GPIO_MODE_DIGITAL;
+    gpio_init_structure.gpio_drv  = GPIO_DRV_6MA;
+    gpio_init_structure.gpio_pupd = GPIO_PUPD_NULL;
+    gpio_init(PIN_TEC_EN_PORT, &gpio_init_structure);
+#if TEC_EN_ACTIVE_HIGH
+    gpio_reset_bits(PIN_TEC_EN_PORT, PIN_TEC_EN_PIN);
+#else
+    gpio_set_bits(PIN_TEC_EN_PORT, PIN_TEC_EN_PIN);
+#endif
+
+    /* Fan off */
+    gpio_init_structure.gpio_pin  = PIN_FAN_PIN;
+    gpio_init(PIN_FAN_PORT, &gpio_init_structure);
+#if FAN_ACTIVE_HIGH
+    gpio_reset_bits(PIN_FAN_PORT, PIN_FAN_PIN);
+#else
+    gpio_set_bits(PIN_FAN_PORT, PIN_FAN_PIN);
+#endif
+
+    /* Display lines to high impedance: dir bit = 1 means input on this SoC */
+    PIN_DISP_PORT->dir |= PIN_DISP_MASK;
+}
 
 void sys_ram_info_dump(void)
 {

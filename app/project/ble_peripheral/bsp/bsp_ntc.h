@@ -13,11 +13,11 @@
 
 /**
  * @brief NTC 分压电路参数
- *        R12 = 51KΩ（上拉电阻）
+ *        R12 = 100KΩ（上拉电阻）
  *        VDDIO 为系统I/O供电电压，通过 pmu_get_vddio() 获取等级后计算
  *        VDDIO(mV) = 2400 + 100 * level
  */
-#define NTC_PULLUP_RESISTOR             51000   // R12 = 51KΩ
+#define NTC_PULLUP_RESISTOR             100000   // R12 = 100KΩ
 #define NTC_VDDIO_MV_DEFAULT            3300    // 默认VDDIO=3.3V（若实际不同需修改）
 
 /**
@@ -27,7 +27,7 @@
  *        T0   = 298.15K (25°C)
  */
 #define NTC_R0                          10000   // 25°C时NTC阻值(Ω)
-#define NTC_B_VALUE                     3950    // NTC B常数
+#define NTC_B_VALUE                     3435    // NTC B常数
 #define NTC_T0_KELVIN                   29815   // 25°C * 100（定点数，避免浮点运算）
 #define NTC_ABS_ZERO                    27315   // 绝对零度 * 100
 
