@@ -6,7 +6,7 @@
 
 #if BSP_CHARGE_EN
 
-#define RECHARGE_THRESHOLD                      (4200)      //4.2V, this value should not less than 3V
+#define RECHARGE_THRESHOLD                      (4050)      //4.05V, avoid micro charge cycles
 
 const char charge_status_info[][29] = {
     "[charge] uninitialized\n",
@@ -22,11 +22,11 @@ void bsp_charge_init(void)
 {
     charge_init_typedef charge_init_struct;
 
-    charge_init_struct.const_curr = CHARGE_CUR_100mA;
-    charge_init_struct.cutoff_curr = CHARGE_CUTOFF_CUR_30mA;
-    charge_init_struct.cutoff_volt = CHARGE_CUTOFF_VOL_4V35;
+    charge_init_struct.const_curr = CHARGE_CUR_20mA;      // 0.5C for 40mAh (501012)
+    charge_init_struct.cutoff_curr = CHARGE_CUTOFF_CUR_2mA5; // 0.06C
+    charge_init_struct.cutoff_volt = CHARGE_CUTOFF_VOL_4V2;  // cell FC = 4.2V
     charge_init_struct.dcin_reset = CHARGE_DCIN_RESET_DIS;
-    charge_init_struct.trick_curr = CHARGE_CUR_20mA;
+    charge_init_struct.trick_curr = CHARGE_CUR_5mA;       // trickle 0.125C
     charge_init_struct.trick_curr_en = ENABLE;
     charge_init_struct.mode = CHARGE_MODE_FULL_DISCONNECT;
 
