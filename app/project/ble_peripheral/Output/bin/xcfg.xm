@@ -8,7 +8,7 @@ config(BYTE, "自定义OSCO电容", "配置24M晶振OSCO负载电容（0.25PF）
 config(CHECK,  "优先使用产测电容值",  "是否优先使用产测校准的OSC电容值，没过产测或者关闭时使用<自定义OSCI电容>、<自定义OSCO电容>",  FT_OSC_CAP_EN,  1);
 
 config(SUB, "蓝牙配置", "蓝牙的相关配置");
-config(TEXT, "BLE名称", "手机上可以看到的BLE蓝牙名称", LE_NAME, 32, "LE-Remoter");
+config(TEXT, "BLE名称", "手机上可以看到的BLE蓝牙名称", LE_NAME, 32, "R2AC63");
 config(MAC, "蓝牙地址", "蓝牙的MAC地址", LE_ADDR, 6, 41:42:00:00:00:00, 41:42:FF:FF:FF:FF, 41:42:00:00:00:01);
 
 config(SUB, "RF参数", "蓝牙RF参数");
