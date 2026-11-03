@@ -26,6 +26,12 @@ static u8   g_display_locked = 0;                   // 0=初始终端显示NTC, 
 /* ---- 灭屏待机：仅电池模式有效（客户 P1/P2） ---- */
 #define SCREEN_OFF_TIMEOUT_MS   5000
 
+/* 定温锁定的解锁条件：实际温度 ≥ 设定+偏离 持续 60s */
+#define TEMP_UNLOCK_DELTA_X10   10      /* 1.0℃，单位 0.1℃（客户 2026-11-03 确认：设定+1℃） */
+#define TEMP_UNLOCK_CONFIRM_MS  60000   /* 持续 60s 才解锁 */
+static u8  g_unlock_pending;
+static u32 g_unlock_tick;
+
 static int  g_disp_hold_c = -1;            /* 当前上屏的温度（℃） */
 #define DISP_DELAY_MS           2000        /* 显示延时 2 秒 */
 #define DISP_HIST_N             8
@@ -539,6 +545,21 @@ static void check_display_lock(void)
     }
 
     if (g_display_locked) {
+        /* ---- 解锁：实际温度远高于设定值，说明已脱离±滞后循环，恢复实时显示 ---- */
+        if (g_actual_temp_c >= (g_set_temp_c * 10 + TEMP_UNLOCK_DELTA_X10)) {
+            if (!g_unlock_pending) {
+                g_unlock_pending = 1;
+                g_unlock_tick    = tick_get();
+            } else if (tick_check_expire(g_unlock_tick, TEMP_UNLOCK_CONFIRM_MS)) {
+                g_display_locked = 0;
+                g_unlock_pending = 0;
+                display_delay_reset();   /* 重新跟随实际温度 */
+                printf("[DISP] Unlock (ntc10=%d >= set10=%d+%d, 60s)\r\n",
+                       g_actual_temp_c, g_set_temp_c * 10, TEMP_UNLOCK_DELTA_X10);
+            }
+        } else {
+            g_unlock_pending = 0;
+        }
         return;
     }
 
@@ -549,6 +570,7 @@ static void check_display_lock(void)
     // 如果开机室温就低于设定值，制冷片没启动(TEC_STOP)，则拒绝锁定，老老实实当温度计用！
     if (g_actual_temp_c <= (g_set_temp_c * 10) && g_tec == TEC_RUN) {
         g_display_locked = 1;
+        g_unlock_pending = 0;
         printf("[DISP] Lock at %d℃ (ntc=%d℃)\r\n", g_set_temp_c, ntc_c);
     }
 }
