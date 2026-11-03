@@ -24,7 +24,6 @@
 #define VBAT_LOW_CONFIRM        5       /* 连续 5 次（2.5s）才关机 */
 
 /* 充电优先：满电前 TEC 禁止；满电后 TEC 全开、停充 */
-#define VBAT_RECHARGE_MV        3600    /* 冷却中电池跌到此值回去充电 */
 #define VBAT_FULL_CONFIRM       10      /* 100ms 内连续判满，防单次抖动 */
 #define DIRECT_MIN_DWELL_MS     2000    /* DIRECT 至少停留 2s 才允许回充 */
 
@@ -41,7 +40,6 @@ static u8  g_vbat_idx;
 static u8  g_vbat_filled;
 static u8  g_vbat_low_cnt;
 static u16 g_vbat_mv;             /* 滤波后的 VBAT(mV) */
-static u8  g_cool_enabled;       /* 1 = 已充满，允许 TEC 全开 */
 static u8  g_full_cnt;           /* 充满连续计数 */
 static u32 g_mode_tick;          /* 进入当前状态的时刻 */
 
@@ -111,13 +109,13 @@ pwr_mode_t power_mode_get(void)
 
 bool power_mode_allow_cool(void)
 {
-    /* 客户策略：插电先充满 -> 再全开制冷 */
-    return (g_dc_online != 0) && (g_cool_enabled != 0);
+    /* 客户需求：插电即允许制冷，与充电同时进行 */
+    return (g_pwr_mode == PWR_CHARGING) || (g_pwr_mode == PWR_DIRECT);
 }
 
 bool power_mode_is_charging(void)
 {
-    return (g_dc_online != 0) && (g_cool_enabled == 0);
+    return (g_pwr_mode == PWR_CHARGING);
 }
 
 u16 power_mode_get_vbat(void)
@@ -200,35 +198,29 @@ void power_mode_process(void)
     /* ---------- 3. 状态迁移 ---------- */
     sta = charge_get_status();
 
-    /* ---- 1) 拔电：清冷却许可并恢复充电器 ---- */
-    if (!g_dc_online) {
-        g_cool_enabled = 0;
-        if (!bsp_charge_is_active()) {
-            bsp_charge_set_active(true);
-        }
-    }
-
     switch (g_pwr_mode) {
     case PWR_INIT:
         g_mode_tick = tick_get();
         g_full_cnt  = 0;
-        g_pwr_mode  = g_dc_online ? PWR_CHARGING : PWR_BATTERY;
+        if (g_dc_online) {
+            g_pwr_mode = (sta == CHARGE_STA_OFF_BUT_DC_IN) ? PWR_DIRECT : PWR_CHARGING;
+        } else {
+            g_pwr_mode = PWR_BATTERY;
+        }
         break;
 
     case PWR_CHARGING:
         if (!g_dc_online) {
             g_pwr_mode = PWR_BATTERY;
         } else if (sta == CHARGE_STA_OFF_BUT_DC_IN) {
-            /* 充满需连续确认；确认后停充、开冷 */
+            /* 充满需连续确认，防无电池抖动 */
             if (g_full_cnt < VBAT_FULL_CONFIRM) {
                 g_full_cnt++;
             }
             if (g_full_cnt >= VBAT_FULL_CONFIRM) {
-                g_cool_enabled = 1;
-                bsp_charge_set_active(false);   /* 停充：让 TEC 独占 VBUS */
                 g_pwr_mode  = PWR_DIRECT;
                 g_mode_tick = tick_get();
-                printf("[PWR] battery full -> COOL ON, charge off\n");
+                printf("[PWR] charge full -> DIRECT\n");
             }
         } else {
             g_full_cnt = 0;
@@ -238,14 +230,13 @@ void power_mode_process(void)
     case PWR_DIRECT:
         if (!g_dc_online) {
             g_pwr_mode = PWR_BATTERY;
-        } else if ((g_vbat_mv > 1500) && (g_vbat_mv < VBAT_RECHARGE_MV)) {
-            /* 冷却耗电使电池掉到 3.6V -> 回到充电优先 */
-            g_cool_enabled = 0;
-            bsp_charge_set_active(true);
-            g_pwr_mode  = PWR_CHARGING;
-            g_mode_tick = tick_get();
-            g_full_cnt  = 0;
-            printf("[PWR] vbat low -> back to CHARGE, cool off\n");
+        } else if (sta >= CHARGE_STA_ON_TRICKLE) {
+            if (tick_check_expire(g_mode_tick, DIRECT_MIN_DWELL_MS)) {
+                g_pwr_mode  = PWR_CHARGING;
+                g_mode_tick = tick_get();
+                g_full_cnt  = 0;
+                printf("[PWR] recharge -> CHARGING\n");
+            }
         }
         break;
 
@@ -253,7 +244,7 @@ void power_mode_process(void)
         if (g_dc_online) {
             g_mode_tick = tick_get();
             g_full_cnt  = 0;
-            g_pwr_mode  = PWR_CHARGING;
+            g_pwr_mode  = (sta == CHARGE_STA_OFF_BUT_DC_IN) ? PWR_DIRECT : PWR_CHARGING;
         } else if (g_vbat_low_cnt >= VBAT_LOW_CONFIRM) {
             g_pwr_mode = PWR_OFF;
             bsp_tec_off();
