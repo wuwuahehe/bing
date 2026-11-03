@@ -490,33 +490,6 @@ void app_temp_control_process(void)
     }
 
     // 3. 设置模式超时检查
-    /* ---- TEC / 充电互斥：TEC 运行时暂停充电 ---- */
-    {
-        static u8 chg_suspend = 0;
-        u16 vusb;
-        if (g_tec == TEC_RUN) {
-            vusb = bsp_get_vusb_mv();
-            /* VBUS 不够才让路：<4.6V 暂停，>4.8V 恢复（滞回） */
-            if (!chg_suspend && vusb < 4600) {
-                chg_suspend = 1;
-            } else if (chg_suspend && vusb > 4800) {
-                chg_suspend = 0;
-            }
-        } else {
-            chg_suspend = 0;
-        }
-        bsp_charge_set_active(!chg_suspend);
-    }
-
-    /* ---- 仅电池模式才灭屏；插电常亮（客户 P5：充电单位闪/充满常亮） ---- */
-    if (power_mode_dc_online()) {
-        g_screen_off = 0;
-    } else if (!g_screen_off && g_state != TEMP_STATE_SETTING &&
-               tick_check_expire(g_activity_tick, SCREEN_OFF_TIMEOUT_MS)) {
-        g_screen_off = 1;
-        printf("[DISP] screen off (battery, 5s)\r\n");
-    }
-
     check_setting_timeout();
 
     // 4. NTC到达设定温度检查(到达则锁定显示)
