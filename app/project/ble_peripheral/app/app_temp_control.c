@@ -25,7 +25,13 @@ static u8   g_tec_debounce_cnt = 0;                 // TEC切换消抖计数器
 static u8   g_display_locked = 0;                   // 0=初始终端显示NTC, 1=锁定显示设定温度
 /* ---- 灭屏待机：仅电池模式有效（客户 P1/P2） ---- */
 #define SCREEN_OFF_TIMEOUT_MS   5000
-static u8   g_screen_off   = 0;   /* 1 = 灭屏待机 */
+
+/* 客户需求：温度稳定 2 秒后才更新显示 */
+#define DISP_STABLE_MS          2000
+
+static int  g_disp_hold_c   = -1;   /* 当前上屏的温度（℃整数） */
+static int  g_disp_cand_c   = -1;   /* 候选新值 */
+static u32  g_disp_cand_tick;       /* 候选值出现时刻 */static u8   g_screen_off   = 0;   /* 1 = 灭屏待机 */
 static u32  g_activity_tick = 0;  /* 最后一次操作时刻 */
                                                     // 用户长按进设置后,退出即锁定恒温显示
 
@@ -53,6 +59,40 @@ static int celsius_to_fahrenheit(int c)
  *   用户长按进入设置模式后显示设定温度(闪烁可调),
  *   退出设置 → 显示锁定, 恒温显示设定温度(如15℃)不再变化.
  */
+/* 温度稳定 2s 后才更新显示值 */
+static void display_stable_update(void)
+{
+    int c;
+
+    if (g_ntc_ready == 0) {
+        return;
+    }
+    c = (g_actual_temp_c + 5) / 10;
+
+    if (g_disp_hold_c < 0) {          /* 上电/重置后首个有效值立即采用 */
+        g_disp_hold_c    = c;
+        g_disp_cand_c    = c;
+        g_disp_cand_tick = tick_get();
+        return;
+    }
+
+    if (c != g_disp_cand_c) {         /* 值变化：重新计时 */
+        g_disp_cand_c    = c;
+        g_disp_cand_tick = tick_get();
+    } else if ((c != g_disp_hold_c) &&
+               tick_check_expire(g_disp_cand_tick, DISP_STABLE_MS)) {
+        g_disp_hold_c = c;            /* 稳定满 2s 才上屏 */
+        printf("[DISP] stable 2s -> %dC\r\n", c);
+    }
+}
+
+/* 模式切换时重置，避免停留在旧值 */
+static void display_stable_reset(void)
+{
+    g_disp_hold_c = -1;
+    g_disp_cand_c = -1;
+}
+
 /* BLE 与显示共用：返回摄氏整数的显示值（℃），钳位 2~50 */
 int app_temp_control_get_display_temp_c(void)
 {
@@ -63,7 +103,7 @@ int app_temp_control_get_display_temp_c(void)
     } else if (g_display_locked) {
         disp = g_set_temp_c;          /* 恒温锁定：保持设定值 */
     } else {
-        disp = (g_actual_temp_c + 5) / 10;   /* 初始终端：NTC 实测四舍五入 */
+        disp = (g_disp_hold_c >= 0) ? g_disp_hold_c : ((g_actual_temp_c + 5) / 10);   /* 稳定 2s 后的值 */
     }
 
     /* 客户需求 7：显示范围 2~50℃且钳位 */
@@ -495,6 +535,9 @@ void app_temp_control_process(void)
             g_tec_debounce_cnt = 0;
         }
         /* battery mode: show real temperature (client: touch -> real temp) */
+        if (g_display_locked) {
+            display_stable_reset();
+        }
         g_display_locked = 0;
     }
 
@@ -512,6 +555,8 @@ void app_temp_control_process(void)
 
     // 4. NTC到达设定温度检查(到达则锁定显示)
     check_display_lock();
+
+    display_stable_update();
 
     // 5. 刷新显示
     update_display();
