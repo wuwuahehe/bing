@@ -26,12 +26,13 @@ static u8   g_display_locked = 0;                   // 0=初始终端显示NTC, 
 /* ---- 灭屏待机：仅电池模式有效（客户 P1/P2） ---- */
 #define SCREEN_OFF_TIMEOUT_MS   5000
 
-/* 客户需求：温度稳定 2 秒后才更新显示 */
-#define DISP_STABLE_MS          2000
-
-static int  g_disp_hold_c   = -1;   /* 当前上屏的温度（℃整数） */
-static int  g_disp_cand_c   = -1;   /* 候选新值 */
-static u32  g_disp_cand_tick;       /* 候选值出现时刻 */static u8   g_screen_off   = 0;   /* 1 = 灭屏待机 */
+static int  g_disp_hold_c = -1;            /* 当前上屏的温度（℃） */
+#define DISP_DELAY_MS           2000        /* 显示延时 2 秒 */
+#define DISP_HIST_N             8
+static int  g_hist_val[DISP_HIST_N];        /* 延时队列：温度值 */
+static u32  g_hist_tick[DISP_HIST_N];       /* 延时队列：入队时刻 */
+static u8   g_hist_wr, g_hist_rd, g_hist_cnt;
+static u8   g_screen_off   = 0;   /* 1 = 灭屏待机 */
 static u32  g_activity_tick = 0;  /* 最后一次操作时刻 */
                                                     // 用户长按进设置后,退出即锁定恒温显示
 
@@ -59,38 +60,51 @@ static int celsius_to_fahrenheit(int c)
  *   用户长按进入设置模式后显示设定温度(闪烁可调),
  *   退出设置 → 显示锁定, 恒温显示设定温度(如15℃)不再变化.
  */
-/* 温度稳定 2s 后才更新显示值 */
-static void display_stable_update(void)
+/* 新显示值入队（与上一个相同则不重复入队） */
+static void display_delay_push(int c)
 {
-    int c;
+    u8 last;
 
-    if (g_ntc_ready == 0) {
-        return;
-    }
-    c = (g_actual_temp_c + 5) / 10;
-
-    if (g_disp_hold_c < 0) {          /* 上电/重置后首个有效值立即采用 */
-        g_disp_hold_c    = c;
-        g_disp_cand_c    = c;
-        g_disp_cand_tick = tick_get();
-        return;
+    if (g_hist_cnt > 0) {
+        last = (u8)((g_hist_wr + DISP_HIST_N - 1) % DISP_HIST_N);
+        if (g_hist_val[last] == c) {
+            return;
+        }
     }
 
-    if (c != g_disp_cand_c) {         /* 值变化：重新计时 */
-        g_disp_cand_c    = c;
-        g_disp_cand_tick = tick_get();
-    } else if ((c != g_disp_hold_c) &&
-               tick_check_expire(g_disp_cand_tick, DISP_STABLE_MS)) {
-        g_disp_hold_c = c;            /* 稳定满 2s 才上屏 */
-        printf("[DISP] stable 2s -> %dC\r\n", c);
+    if (g_hist_cnt >= DISP_HIST_N) {          /* 队列满：丢弃最旧一条 */
+        g_hist_rd = (u8)((g_hist_rd + 1) % DISP_HIST_N);
+        g_hist_cnt--;
+    }
+
+    g_hist_val[g_hist_wr]  = c;
+    g_hist_tick[g_hist_wr] = tick_get();
+    g_hist_wr = (u8)((g_hist_wr + 1) % DISP_HIST_N);
+    if (g_hist_cnt < DISP_HIST_N) {
+        g_hist_cnt++;
     }
 }
 
-/* 模式切换时重置，避免停留在旧值 */
-static void display_stable_reset(void)
+/* 入队已满 2s 的值依次上屏 */
+static void display_delay_update(void)
+{
+    while (g_hist_cnt > 0) {
+        if (!tick_check_expire(g_hist_tick[g_hist_rd], DISP_DELAY_MS)) {
+            break;
+        }
+        g_disp_hold_c = g_hist_val[g_hist_rd];
+        g_hist_rd = (u8)((g_hist_rd + 1) % DISP_HIST_N);
+        g_hist_cnt--;
+    }
+}
+
+/* 模式切换时重置延时队列 */
+static void display_delay_reset(void)
 {
     g_disp_hold_c = -1;
-    g_disp_cand_c = -1;
+    g_hist_wr  = 0;
+    g_hist_rd  = 0;
+    g_hist_cnt = 0;
 }
 
 /* BLE 与显示共用：返回摄氏整数的显示值（℃），钳位 2~50 */
@@ -536,7 +550,7 @@ void app_temp_control_process(void)
         }
         /* battery mode: show real temperature (client: touch -> real temp) */
         if (g_display_locked) {
-            display_stable_reset();
+            display_delay_reset();
         }
         g_display_locked = 0;
     }
@@ -556,7 +570,15 @@ void app_temp_control_process(void)
     // 4. NTC到达设定温度检查(到达则锁定显示)
     check_display_lock();
 
-    display_stable_update();
+    /* 每轮把当前温度候选值入队，2s 后才会上屏 */
+    if (g_ntc_ready) {
+        int cand = (g_actual_temp_c + 5) / 10;
+        if (cand < 2)  cand = 2;
+        if (cand > 50) cand = 50;
+        display_delay_push(cand);
+    }
+
+    display_delay_update();
 
     // 5. 刷新显示
     update_display();
