@@ -123,6 +123,14 @@ int app_temp_control_get_display_temp_c(void)
     /* 客户需求 7：显示范围 2~50℃且钳位 */
     if (disp < 2)  disp = 2;
     if (disp > 50) disp = 50;
+
+    /* 客户要求（插电）：显示温度不得低于设定温度
+     *   即：插电时屏显 = max(实际显示值, 设定值)；拔电后显示实时温度。 */
+#if R2_PRODUCT_COOLING
+    if (power_mode_dc_online() && (disp < g_set_temp_c)) {
+        disp = g_set_temp_c;
+    }
+#endif
     return disp;
 }
 
