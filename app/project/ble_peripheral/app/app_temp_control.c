@@ -489,6 +489,15 @@ void app_temp_control_process(void)
         g_display_locked = 0;
     }
 
+    /* ---- 仅电池模式才灭屏；插电常亮（客户 P5：充电单位闪 / 充满常亮） ---- */
+    if (power_mode_dc_online()) {
+        g_screen_off = 0;
+    } else if (!g_screen_off && g_state != TEMP_STATE_SETTING &&
+               tick_check_expire(g_activity_tick, SCREEN_OFF_TIMEOUT_MS)) {
+        g_screen_off = 1;
+        printf("[DISP] screen off (battery, 5s)\r\n");
+    }
+
     // 3. 设置模式超时检查
     check_setting_timeout();
 
