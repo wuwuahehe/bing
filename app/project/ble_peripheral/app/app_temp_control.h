@@ -90,6 +90,7 @@ u8 app_temp_control_get_flash_state(void);
 
 void app_temp_control_on_pp_double(void);
 int  app_temp_control_get_temp_c(void);
+int  app_temp_control_get_display_temp_c(void);   /* 显示值（℃，已钳位 2~50） */
 void app_temp_control_set_temp_c(int c);
 
 int  app_temp_control_is_ntc_ready(void);

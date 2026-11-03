@@ -119,7 +119,7 @@ static void r2_report_current(u8 cmd)
         r2_send(cmd, 0x00, r2_unit_byte());
         return;
     }
-    c = app_temp_control_get_temp_c();
+    c = app_temp_control_get_display_temp_c();
     r2_send(cmd, r2_code_from_c(c), r2_unit_byte());
 }
 
@@ -303,7 +303,7 @@ void ble_r2_service_proc(void)
     if (!app_temp_control_is_ntc_ready()) {
         code = 0x00;
     } else {
-        code = r2_code_from_c(app_temp_control_get_temp_c());
+        code = r2_code_from_c(app_temp_control_get_display_temp_c());
     }
 
     /* 10s 定时上报 */

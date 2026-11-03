@@ -53,22 +53,31 @@ static int celsius_to_fahrenheit(int c)
  *   用户长按进入设置模式后显示设定温度(闪烁可调),
  *   退出设置 → 显示锁定, 恒温显示设定温度(如15℃)不再变化.
  */
-int app_temp_control_get_display_temp(void)
+/* BLE 与显示共用：返回摄氏整数的显示值（℃），钳位 2~50 */
+int app_temp_control_get_display_temp_c(void)
 {
     int disp;
 
     if (g_state == TEMP_STATE_SETTING) {
-        // 设置模式: 显示设定温度
-        disp = g_set_temp_c;
+        disp = g_set_temp_c;          /* 设置模式：显示设定值 */
     } else if (g_display_locked) {
-        // 恒温锁定: 显示设定温度(用户已设过温度)
-        disp = g_set_temp_c;
+        disp = g_set_temp_c;          /* 恒温锁定：保持设定值 */
     } else {
-        // 初始终端: 显示NTC实际温度(℃), 四舍五入取整
-        disp = (g_actual_temp_c + 5) / 10;
+        disp = (g_actual_temp_c + 5) / 10;   /* 初始终端：NTC 实测四舍五入 */
     }
 
-    return (g_unit == TEMP_UNIT_C) ? disp : celsius_to_fahrenheit(disp);
+    /* 客户需求 7：显示范围 2~50℃且钳位 */
+    if (disp < 2)  disp = 2;
+    if (disp > 50) disp = 50;
+    return disp;
+}
+
+int app_temp_control_get_display_temp(void)
+{
+    int c = app_temp_control_get_display_temp_c();
+
+    /* 钳位在摄氏度侧完成，再转华氏度 */
+    return (g_unit == TEMP_UNIT_C) ? c : celsius_to_fahrenheit(c);
 }
 
 /* BLE 协议用：实际温度（摄氏整数） */
@@ -81,7 +90,7 @@ int app_temp_control_is_ntc_ready(void)
 int app_temp_control_get_temp_c(void)
 {
     int c = (g_actual_temp_c + 5) / 10;
-    if (c < 0)  c = 0;
+    if (c < 2)  c = 2;
     if (c > 50) c = 50;
     return c;
 }
