@@ -249,15 +249,15 @@ void app_temp_control_on_pp_double(void)
 
 void app_temp_control_on_pp_long(void)
 {
-#if !R2_PRODUCT_COOLING
-    /* 普通版无温控，不提供设定温度模式 */
-    return;
-#endif
-    /* 灭屏时长按只唤醒，不进设置 */
+    /* 灭屏时长按只唤醒，不进设置（两个版本都适用） */
     if (g_screen_off) {
         screen_activity_touch();
         return;
     }
+#if !R2_PRODUCT_COOLING
+    /* 普通版无温控，点亮屏后长按不做任何事 */
+    return;
+#endif
     if (g_state == TEMP_STATE_IDLE) {
         // 长按进入设置模式
         g_state = TEMP_STATE_SETTING;
