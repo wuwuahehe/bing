@@ -241,6 +241,10 @@ void app_temp_control_on_pp_double(void)
 
 void app_temp_control_on_pp_long(void)
 {
+#if !R2_PRODUCT_COOLING
+    /* 普通版无温控，不提供设定温度模式 */
+    return;
+#endif
     /* 灭屏时长按只唤醒，不进设置 */
     if (g_screen_off) {
         screen_activity_touch();
@@ -474,9 +478,13 @@ void app_temp_control_init(void)
     // 确保TEC初始关闭
     bsp_tec_off();
 
+#if R2_PRODUCT_COOLING
     // 风扇: 系统上电即开启持续运行, 不再关闭
     bsp_fan_set(1);
     printf("[FAN] Always ON (system init)\r\n");
+#else
+    bsp_fan_set(0);   /* 普通版无风扇 */
+#endif
 
     // 预充中值滤波缓冲区
     for (i = 0; i < NTC_MEDIAN_WINDOW; i++) {
@@ -489,12 +497,14 @@ void app_temp_control_init(void)
         ntc_c = (ntc_raw + 5) / 10;
         g_actual_temp_c = ntc_raw;
 
+#if R2_PRODUCT_COOLING
         if (ntc_raw >= (g_set_temp_c * 10 + TEMP_HYSTERESIS_X10)) {
             bsp_tec_on();
             g_tec = TEC_RUN;
             printf("[TEC] Init ON (ntc10=%d >= set10=%d+%d)\r\n",
                    ntc_raw, g_set_temp_c * 10, TEMP_HYSTERESIS_X10);
         }
+#endif
     }
 
     printf("[APP] Temp control init: set=%d℃, unit=C, ntc=%d, display_unlocked\r\n",
@@ -513,6 +523,9 @@ void app_temp_control_init(void)
  */
 static void check_display_lock(void)
 {
+#if !R2_PRODUCT_COOLING
+    return;   /* 普通版无设定温度，显示始终跟随实际温度 */
+#endif
     if (g_state == TEMP_STATE_SETTING) {
         return;
     }

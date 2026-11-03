@@ -64,6 +64,14 @@
  *****************************************************************************/
 #define AB_FOT_EN                       1                       //FOTA升级使能
 #define AB_FOT_TYPE                     AB_FOT_TYPE_PACK        //FOTA升级方式选择
+/* 产品型号：
+ *   1 = 制冷版 R2-C（TEC + 风扇 + 温控 + 设定温度）
+ *   0 = 普通版 R2-N（仅测温显示，无制冷）
+ * 硬件同一套，仅固件区别 */
+#ifndef R2_PRODUCT_COOLING
+#define R2_PRODUCT_COOLING              1
+#endif
+
 #define LE_FOTA_EN                      AB_FOT_EN               //BLE FOTA升级使能
 
 #if (FLASH_SIZE == FSIZE_256K)

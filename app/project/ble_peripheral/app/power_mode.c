@@ -109,8 +109,12 @@ pwr_mode_t power_mode_get(void)
 
 bool power_mode_allow_cool(void)
 {
+#if !R2_PRODUCT_COOLING
+    return 0;   /* 普通版无制冷功能 */
+#else
     /* 客户需求：插电即允许制冷，与充电同时进行 */
     return (g_pwr_mode == PWR_CHARGING) || (g_pwr_mode == PWR_DIRECT);
+#endif
 }
 
 bool power_mode_is_charging(void)
