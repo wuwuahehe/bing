@@ -27,7 +27,7 @@ void bsp_charge_init(void)
     charge_init_typedef charge_init_struct;
 
     charge_init_struct.const_curr = CHARGE_CUR_20mA;      // 0.5C for 40mAh (501012)
-    charge_init_struct.cutoff_curr = CHARGE_CUTOFF_CUR_2mA5; // 0.06C
+    charge_init_struct.cutoff_curr = CHARGE_CUTOFF_CUR_5mA;  /* 试验版：2.5mA 判不满，放宽到 5mA */ // 0.06C
     charge_init_struct.cutoff_volt = CHARGE_CUTOFF_VOL_4V2;  // cell FC = 4.2V
     charge_init_struct.dcin_reset = CHARGE_DCIN_RESET_DIS;
     charge_init_struct.trick_curr = CHARGE_CUR_5mA;       // trickle 0.125C
